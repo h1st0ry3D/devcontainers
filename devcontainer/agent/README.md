@@ -6,9 +6,8 @@ Dev container with Homebrew, opencode (AI agent), and dotfiles from hstorz/dotfi
 
 1. **Base Image** - Ubuntu Noble
 2. **Install Homebrew** - Official install script (Linuxbrew)
-3. **Download Brewfile** - From github.com/hstorz/dotfiles/Brewfile
-4. **Run bundle install** - Install all packages
-5. **Apply chezmoi** - Pull dotfiles on container start
+3. **Run brew bundle** - At build time from github.com/hstorz/dotfiles/Brewfile
+4. **Apply chezmoi** - On container start (postCreateCommand)
 
 ## Quick Start
 
