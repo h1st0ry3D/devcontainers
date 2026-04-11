@@ -1,0 +1,17 @@
+{
+  "name": "Agent Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "forwardPorts": [],
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+  "remoteUser": "linuxbrew",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anomalyco.opencode"
+      ]
+    }
+  }
+}
