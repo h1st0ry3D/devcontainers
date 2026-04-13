@@ -1,4 +1,4 @@
-# Brew Dev Container
+# Agent Dev Container
 
 Dev container with Homebrew, opencode (AI agent), and dotfiles from hstorz/dotfiles.
 
