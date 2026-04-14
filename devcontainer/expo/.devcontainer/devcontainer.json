@@ -1,0 +1,56 @@
+{
+	"name": "Expo (React Native)",
+	"image": "mcr.microsoft.com/devcontainers/base:bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "17"
+		}
+	},
+	"forwardPorts": [8081, 19000, 19001, 19002, 19006],
+	"portsAttributes": {
+		"8081": {
+			"label": "Metro Bundler",
+			"visibility": "public"
+		},
+		"19000": {
+			"label": "Expo Dev Tools",
+			"visibility": "public"
+		},
+		"19001": {
+			"label": "React Native Debugger",
+			"visibility": "public"
+		},
+		"19002": {
+			"label": "Expo Dev Client",
+			"visibility": "public"
+		},
+		"19006": {
+			"label": "Expo Web",
+			"visibility": "public"
+		}
+	},
+	"runArgs": [
+		"-p=8081:8081",
+		"-p=19000:19000",
+		"-p=19001:19001",
+		"-p=19002:19002",
+		"-p=19006:19006",
+		"--add-host=host.docker.internal:host-gateway",
+		"--env-file",
+		".devcontainer/.env"
+	],
+	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+	"initializeCommand": "bash .devcontainer/initializeCommand.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": ["biomejs.biome", "expo.vscode-expo-tools"]
+		}
+	},
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+	],
+	"remoteUser": "root",
+	"containerEnv": {
+		"CHOKIDAR_USEPOLLING": "true"
+	}
+}
