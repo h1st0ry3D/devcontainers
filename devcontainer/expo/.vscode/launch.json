@@ -1,0 +1,50 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug Android (Expo)",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "bun",
+			"runtimeArgs": ["expo", "start", "--android"],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"env": {
+				"REACT_NATIVE_PACKAGER_HOSTNAME": "${env:REACT_NATIVE_PACKAGER_HOSTNAME}"
+			}
+		},
+		{
+			"name": "Debug iOS (Expo)",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "bun",
+			"runtimeArgs": ["expo", "start", "--ios"],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"env": {
+				"REACT_NATIVE_PACKAGER_HOSTNAME": "${env:REACT_NATIVE_PACKAGER_HOSTNAME}"
+			}
+		},
+		{
+			"name": "Debug Web (Expo)",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "bun",
+			"runtimeArgs": ["expo", "start", "--web"],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		},
+		{
+			"name": "Attach to Metro",
+			"type": "node",
+			"request": "attach",
+			"port": 8081,
+			"address": "localhost",
+			"localRoot": "${workspaceFolder}",
+			"remoteRoot": "/workspace"
+		}
+	]
+}

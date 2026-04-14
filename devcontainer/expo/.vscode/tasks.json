@@ -1,0 +1,123 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Metro (Expo)",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "start"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Android",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "start", "--android"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Start iOS",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "start", "--ios"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Web",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "start", "--web"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Android (Dev Client)",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "run:android"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build iOS (Dev Client)",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "run:ios"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Prebuild (Generate Native Code)",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "prebuild"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Connect Android Emulator",
+			"type": "shell",
+			"command": "adb",
+			"args": ["connect", "host.docker.internal:5555"],
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "silent"
+			}
+		},
+		{
+			"label": "List Android Devices",
+			"type": "shell",
+			"command": "adb",
+			"args": ["devices"],
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			}
+		}
+	]
+}

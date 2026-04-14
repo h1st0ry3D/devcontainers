@@ -1,0 +1,22 @@
+{
+	"npm.packageManager": "bun",
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"biome.lspBin": "${workspaceFolder}/node_modules/.bin/biome",
+	"editor.codeActionsOnSave": {
+		"source.organizeImports.biome": "explicit",
+		"source.fixAll.biome": "explicit"
+	},
+	"emmet.includeLanguages": {
+		"javascript": "jsx",
+		"typescript": "tsx"
+	},
+	"tailwindCSS.includeLanguages": {
+		"javascript": "jsx",
+		"typescript": "tsx"
+	},
+	"files.associations": {
+		"*.tsx": "typescriptreact"
+	}
+}
