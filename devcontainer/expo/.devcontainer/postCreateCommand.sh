@@ -6,32 +6,22 @@ echo " Expo Dev Container - Post Create Setup "
 echo "=========================================="
 
 echo ""
-echo "Installing Bun..."
-if ! command -v bun &> /dev/null; then
-    curl -fsSL https://bun.sh/install | bash
-    export PATH="$HOME/.bun/bin:$PATH"
-fi
-
-echo ""
+echo "Node version: $(node --version)"
+echo "npm version: $(npm --version)"
 echo "Bun version: $(bun --version)"
-
-echo ""
-echo "Installing expo-cli globally..."
-bun install -g expo-cli
+echo "expo-cli version: $(expo --version)"
 
 echo ""
 echo "Installing project dependencies with Bun..."
-if [ -f "bun.lockb" ] || [ -f "package.json" ]; then
+if [ -f "package.json" ]; then
     bun install
 else
-    echo "No lockfile found. Running 'bun install' in project root..."
-    bun install
+    echo "No package.json found. Skipping dependency install."
 fi
 
 echo ""
 echo "Installing Expo dependencies..."
 if [ -f "package.json" ]; then
-    # Check if expo is in dependencies
     if grep -q "\"expo\"" package.json 2>/dev/null || grep -q '"expo"' package.json 2>/dev/null; then
         bun expo install
     fi
@@ -48,21 +38,19 @@ fi
 
 echo ""
 echo "=========================================="
-echo " Dev container ready with Bun! "
+echo " Dev container ready! "
 echo "=========================================="
+echo ""
+echo "Available tools:"
+echo "  node $(node --version)"
+echo "  npm $(npm --version)"
+echo "  bun $(bun --version)"
+echo "  expo $(expo --version)"
 echo ""
 echo "To run Expo app:"
 echo "  bun expo start"
 echo ""
-echo "For Android device/emulator:"
-echo "  bun expo start --android"
-echo ""
-echo "For iOS simulator (macOS host only):"
-echo "  bun expo start --ios"
-echo ""
 echo "For development builds (dev client):"
 echo "  bun expo run:android"
 echo "  bun expo run:ios"
-echo ""
-echo "Package Manager: Bun $(bun --version)"
 echo "=========================================="

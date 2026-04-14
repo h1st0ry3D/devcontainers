@@ -1,6 +1,8 @@
 {
 	"name": "Expo (React Native)",
-	"image": "mcr.microsoft.com/devcontainers/base:bookworm",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {
 			"version": "17"
@@ -36,14 +38,27 @@
 		"-p=19002:19002",
 		"-p=19006:19006",
 		"--add-host=host.docker.internal:host-gateway",
-		"--env-file",
+		"--env-file", 
 		".devcontainer/.env"
 	],
 	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
 	"initializeCommand": "bash .devcontainer/initializeCommand.sh",
 	"customizations": {
 		"vscode": {
-			"extensions": ["biomejs.biome", "expo.vscode-expo-tools"]
+			"extensions": ["biomejs.biome", "expo.vscode-expo-tools"],
+			"settings": {
+				"npm.packageManager": "bun",
+				"terminal.integrated.env.linux": {
+					"PATH": "${env:PATH}:/usr/local/bin"
+				},
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "/bin/bash",
+						"args": ["-l"]
+					}
+				}
+			}
 		}
 	},
 	"mounts": [
