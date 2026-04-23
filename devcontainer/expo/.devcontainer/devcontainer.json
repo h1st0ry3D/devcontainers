@@ -61,20 +61,20 @@
 			}
 		}
 	},
-"mounts": [
-	"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-	{
-		"source": "${localWorkspaceFolder}",
-		"target": "/workspace",
-		"type": "bind",
-		"consistency": "cached"
-	},
-	{
-		"source": "expo-node_modules",
-		"target": "/workspace/node_modules",
-		"type": "volume"
-	}
-],
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+    {
+      "source": "${localWorkspaceFolder}/app",
+      "target": "/workspace",
+      "type": "bind",
+      "consistency": "cached"
+    },
+    {
+      "source": "expo-node_modules",
+      "target": "/workspace/node_modules",
+      "type": "volume"
+    }
+  ],
 "remoteUser": "vscode",
 "updateRemoteUserUID": true,
 	"containerEnv": {

@@ -33,7 +33,7 @@ fi
 
 echo ""
 echo "Installing project dependencies..."
-if [ -f "package.json" ]; then
+if [ -f "/workspace/package.json" ]; then
     # Try bun install first, fall back to npm if it fails
     bun install || npm install
 else
@@ -42,8 +42,8 @@ fi
 
 echo ""
 echo "Installing Expo dependencies..."
-if [ -f "package.json" ]; then
-    if grep -q "\"expo\"" package.json 2>/dev/null || grep -q '"expo"' package.json 2>/dev/null; then
+if [ -f "/workspace/package.json" ]; then
+    if grep -q "\"expo\"" /workspace/package.json 2>/dev/null || grep -q '"expo"' /workspace/package.json 2>/dev/null; then
         bun expo install
     fi
 fi
