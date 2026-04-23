@@ -3,7 +3,6 @@ FROM mcr.microsoft.com/devcontainers/base:bookworm
 # Install dependencies for Android development
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y --no-install-recommends \
-    sudo \
     openjdk-17-jdk \
     android-tools-adb \
     android-tools-fastboot \
@@ -20,9 +19,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     libgbm1 \
     libasound2 \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
-
-# Allow vscode user to run sudo without password
-RUN echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Install Node.js 22.x (LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
@@ -58,6 +54,9 @@ WORKDIR /workspace
 
 # Disable React Native DevTools auto-launch
 ENV REACT_NATIVE_DEBUGGER_DISABLED=true
+
+# Increase Node memory limit for large builds
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 # Verify installations
 RUN echo "Node version: $(node --version)" && \

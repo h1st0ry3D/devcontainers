@@ -16,7 +16,20 @@ echo "Bun version: $(bun --version)"
 
 echo ""
 echo "Fixing workspace permissions..."
-sudo chown -R vscode:vscode /workspace 2>/dev/null || true
+# updateRemoteUserUID should handle this, but ensure workspace is writable
+if [ ! -w /workspace ]; then
+    echo "Warning: /workspace not writable, attempting fix..."
+    # Try to fix ownership (works if container is restarted with correct UID)
+    chmod 777 /workspace 2>/dev/null || true
+fi
+
+echo ""
+echo "Checking node_modules mount..."
+if mount | grep -q "node_modules.*volume"; then
+    echo "✓ node_modules is on a volume (isolated from host)"
+else
+    echo "⚠ node_modules may be visible on host (bind mount limitation)"
+fi
 
 echo ""
 echo "Installing project dependencies..."
