@@ -41,7 +41,7 @@
 		"--env-file", 
 		".devcontainer/.env"
 	],
-	"postCreateCommand": "bash .devcontainer/setup.sh",
+	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
 	"initializeCommand": "bash .devcontainer/initializeCommand.sh",
 	"customizations": {
 		"vscode": {
@@ -61,9 +61,12 @@
 			}
 		}
 	},
-	"mounts": [
-		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-	],
+"mounts": [
+	"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+	"type=volume,source=expo-node_modules,target=/workspace/node_modules"
+],
+"remoteUser": "vscode",
+"updateRemoteUserUID": true,
 	"containerEnv": {
 		"CHOKIDAR_USEPOLLING": "true"
 	}

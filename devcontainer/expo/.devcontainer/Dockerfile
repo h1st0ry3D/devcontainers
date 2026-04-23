@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/devcontainers/base:bookworm
 # Install dependencies for Android development
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y --no-install-recommends \
+    sudo \
     openjdk-17-jdk \
     android-tools-adb \
     android-tools-fastboot \
@@ -19,6 +20,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     libgbm1 \
     libasound2 \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# Allow vscode user to run sudo without password
+RUN echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Install Node.js 22.x (LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
@@ -48,10 +52,6 @@ ENV PATH="/usr/local/bin:/usr/bin:${PATH}"
 # Set up Android SDK environment
 ENV ANDROID_HOME=/usr/lib/android-sdk
 ENV PATH="${PATH}:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin"
-
-# Create non-root user for security
-RUN groupadd -r bun && useradd -r -g bun -s /bin/bash bun \
-    && mkdir -p /home/bun && chown -R bun:bun /home/bun
 
 # Create workspace directory
 WORKDIR /workspace

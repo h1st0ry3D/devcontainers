@@ -15,24 +15,8 @@ echo "npm version: $(npm --version)"
 echo "Bun version: $(bun --version)"
 
 echo ""
-echo "Checking for expo command..."
-if command -v expo &> /dev/null; then
-    echo "expo-cli version: $(expo --version)"
-else
-    echo "expo command not found. Installing expo-cli..."
-    npm install -g expo-cli@6.3.12
-    echo "expo-cli version: $(expo --version)"
-fi
-
-echo ""
-echo "Setting up workspace permissions..."
-# Ensure workspace is writable
-if [ -w /workspace ]; then
-    echo "Workspace is writable."
-else
-    echo "Warning: /workspace is not writable. Fixing permissions..."
-    chmod -R u+w /workspace 2>/dev/null || chmod 777 /workspace 2>/dev/null || true
-fi
+echo "Fixing workspace permissions..."
+sudo chown -R vscode:vscode /workspace 2>/dev/null || true
 
 echo ""
 echo "Installing project dependencies..."
