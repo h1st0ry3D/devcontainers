@@ -63,7 +63,17 @@
 	},
 "mounts": [
 	"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-	"type=volume,source=expo-node_modules,target=/workspace/node_modules"
+	{
+		"source": "${localWorkspaceFolder}",
+		"target": "/workspace",
+		"type": "bind",
+		"consistency": "cached"
+	},
+	{
+		"source": "expo-node_modules",
+		"target": "/workspace/node_modules",
+		"type": "volume"
+	}
 ],
 "remoteUser": "vscode",
 "updateRemoteUserUID": true,
