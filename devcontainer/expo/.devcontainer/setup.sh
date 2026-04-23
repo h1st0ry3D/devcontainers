@@ -2,7 +2,7 @@
 set -e
 
 echo "=========================================="
-echo " Expo Dev Container - Post Create Setup "
+echo " Expo Dev Container - Setup "
 echo "=========================================="
 
 echo ""
@@ -26,7 +26,6 @@ fi
 
 echo ""
 echo "Setting up workspace permissions..."
-# Ensure workspace is writable
 if [ -w /workspace ]; then
     echo "Workspace is writable."
 else
@@ -47,7 +46,7 @@ echo ""
 echo "Installing Expo dependencies..."
 if [ -f "package.json" ]; then
     if grep -q "\"expo\"" package.json 2>/dev/null || grep -q '"expo"' package.json 2>/dev/null; then
-        bun expo install
+        bun expo install || true
     fi
 fi
 
