@@ -8,6 +8,7 @@ A complete development environment for Expo/React Native with Bun, optimized for
 - 📱 **iOS + Android** - Support for both platforms
 - 🐳 **Dev Container** - Consistent, isolated environment
 - 🍎 **ARM64 Optimized** - Native Apple Silicon support
+- 🔒 **Isolated Dependencies** - `node_modules` stored in Docker volume (not on host)
 - 🔧 **Pre-configured** - VS Code tasks and debug configs included
 
 ## Quick Start
@@ -19,11 +20,32 @@ A complete development environment for Expo/React Native with Bun, optimized for
 3. Select **"Dev Containers: Reopen in Container"**
 4. Wait for the container to build (first time may take 2-3 minutes)
 
-### 2. Install Dependencies
+### 2. Project Structure
 
-The container automatically installs dependencies on first launch. If needed, run manually:
+```
+.
+├── .devcontainer/          # Dev container configuration
+│   ├── devcontainer.json   # Container settings
+│   ├── Dockerfile          # Container image definition
+│   ├── postCreateCommand.sh # Post-create setup (auto-installs deps)
+│   └── .env               # Auto-generated host IP
+├── app/                   # Your Expo/React Native app
+│   ├── package.json       # App dependencies
+│   ├── src/               # Source code
+│   ├── node_modules/      # ⚠️  Docker volume (isolated, not on host!)
+│   └── ...
+├── .vscode/               # VS Code settings
+└── README.md              # This file
+```
+
+**Important:** Your application code lives in the `app/` directory. The `node_modules` folder inside `app/` is stored in a Docker volume and is **not visible on your host filesystem** for security.
+
+### 3. Install Dependencies
+
+The container **automatically installs dependencies** on first launch via `postCreateCommand`. If you need to reinstall:
 
 ```bash
+cd app
 bun install
 ```
 
@@ -45,6 +67,8 @@ Or use the keyboard shortcut: `Cmd+Shift+B` (runs default task - Start Metro)
 ### Option 2: Terminal Commands
 
 ```bash
+cd app
+
 # Start Metro bundler
 bun expo start
 
@@ -83,10 +107,17 @@ bun expo start --web
 
 3. **Start Expo**
    ```bash
+   cd app
    bun expo start --android
    ```
    
    Or press `a` in the Metro terminal
+
+### How It Works
+
+The container communicates with the Android emulator on your host through forwarded ports and ADB over network:
+- Container ADB → `host.docker.internal:5555` → Host emulator
+- Metro bundler (port 8081) forwards JS bundle to the app
 
 ### Troubleshooting Android
 
@@ -126,10 +157,20 @@ adb connect host.docker.internal:5555
    
    In the devcontainer:
    ```bash
+   cd app
    bun expo start --ios
    ```
    
    Or press `i` in the Metro terminal
+
+### How It Works
+
+- The container runs **Linux**, so it cannot run iOS Simulator directly
+- iOS Simulator runs on your **macOS host**
+- Communication happens through forwarded ports:
+  - Metro bundler (port 8081) serves JS bundle
+  - Expo Dev Tools (port 19000) manages the connection
+  - The simulator app connects back to the container via your host IP
 
 ### Troubleshooting iOS
 
@@ -144,6 +185,36 @@ open -a Simulator
 cat .devcontainer/.env
 # Should show: REACT_NATIVE_PACKAGER_HOSTNAME=<your-host-ip>
 ```
+
+## Isolated Dependencies (Security)
+
+This devcontainer stores `node_modules` in a **Docker volume** that is isolated from your host filesystem:
+
+| Location | `node_modules` | Description |
+|----------|---------------|-------------|
+| **Host** | Empty directory | Docker mount point (in `.gitignore`) |
+| **Container** | 391+ packages | Actual dependencies in Docker volume |
+
+### Benefits
+
+- 🔒 **Security** - Node modules with vulnerabilities are isolated in the container
+- 🧹 **Clean Host** - No `node_modules` pollution on your Mac
+- 🚀 **Fast Cleanup** - Remove container = remove all dependencies instantly
+- 📦 **Reproducible** - Same dependency tree for all team members
+
+### How It Works
+
+The devcontainer mounts a Docker volume at `/workspace/app/node_modules`:
+
+```json
+{
+  "source": "expo-node_modules",
+  "target": "/workspace/app/node_modules",
+  "type": "volume"
+}
+```
+
+All `bun install` / `npm install` operations write to this volume, **not** your host disk.
 
 ## Debugging
 
@@ -165,6 +236,8 @@ The container forwards the React Native debugger port (19001). You can connect f
 For development client builds (when you need native modules):
 
 ```bash
+cd app
+
 # Generate native code
 bun expo prebuild
 
@@ -185,6 +258,8 @@ Or use VS Code tasks:
 This devcontainer uses Bun instead of npm/yarn:
 
 ```bash
+cd app
+
 # Install dependencies
 bun install
 
@@ -201,25 +276,6 @@ bun expo install <package-name>
 bun run <script-name>
 ```
 
-## Project Structure
-
-```
-.
-├── .devcontainer/          # Dev container configuration
-│   ├── devcontainer.json   # Container settings
-│   ├── Dockerfile          # Container image definition
-│   ├── postCreateCommand.sh # Post-create setup
-│   └── .env               # Auto-generated host IP
-├── .vscode/               # VS Code settings
-│   ├── tasks.json         # Task definitions
-│   ├── launch.json        # Debug configurations
-│   └── settings.json      # Editor settings
-├── src/                   # Source code
-│   └── app/              # Expo Router app directory
-├── package.json          # Dependencies and scripts
-└── README.md             # This file
-```
-
 ## Environment Variables
 
 The container automatically sets these:
@@ -228,20 +284,20 @@ The container automatically sets these:
 |----------|-------------|
 | `REACT_NATIVE_PACKAGER_HOSTNAME` | Host IP for Metro bundler (auto-detected) |
 | `ANDROID_HOME` | Android SDK location |
-| `BUN_INSTALL` | Bun installation directory |
 | `CHOKIDAR_USEPOLLING` | File watching mode for containers |
+| `NODE_OPTIONS` | `--max-old-space-size=4096` for large builds |
 
 ## Ports
 
-The container forwards these ports:
+The container forwards these ports for host communication:
 
-| Port | Service |
-|------|---------|
-| 8081 | Metro Bundler |
-| 19000 | Expo Dev Tools |
-| 19001 | React Native Debugger |
-| 19002 | Expo Dev Client |
-| 19006 | Expo Web |
+| Port | Service | Used By |
+|------|---------|---------|
+| 8081 | Metro Bundler | JS bundling for simulators/devices |
+| 19000 | Expo Dev Tools | Expo development server |
+| 19001 | React Native Debugger | Chrome DevTools / RN Debugger |
+| 19002 | Expo Dev Client | Development client builds |
+| 19006 | Expo Web | Web development |
 
 ## Troubleshooting
 
@@ -289,17 +345,19 @@ docker buildx prune -f
 
 ## Tips & Best Practices
 
-1. **Use VS Code Tasks**: Instead of typing commands, use `Cmd+Shift+P` → "Tasks: Run Task"
+1. **Always work in `app/` directory** - Your Expo app code is in `app/`, not the project root
 
-2. **Android First**: Always start the Android emulator on host before starting Expo
+2. **Use VS Code Tasks** - Instead of typing commands, use `Cmd+Shift+P` → "Tasks: Run Task"
 
-3. **Connect ADB**: Run `adb connect host.docker.internal:5555` before starting Android builds
+3. **Android First** - Always start the Android emulator on host before starting Expo
 
-4. **Hot Reload**: Changes are automatically reflected in the running app
+4. **Connect ADB** - Run `adb connect host.docker.internal:5555` before starting Android builds
 
-5. **Debugging**: Use `F5` to start debugging - breakpoints work in both JS and native code
+5. **Hot Reload** - Changes are automatically reflected in the running app
 
-6. **Package Scripts**: Add frequently used commands to `package.json` scripts section
+6. **Debugging** - Use `F5` to start debugging - breakpoints work in both JS and native code
+
+7. **Clean Host** - Don't run `bun install` on your host Mac - use the container terminal instead
 
 ## Useful Commands
 
@@ -319,10 +377,10 @@ adb devices
 xcrun simctl list devices
 
 # Expo diagnostics
-bun expo doctor
+cd app && bun expo doctor
 
 # Clear caches
-bun expo start --clear
+cd app && bun expo start --clear
 ```
 
 ## References

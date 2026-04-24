@@ -74,11 +74,6 @@
       "source": "expo-node_modules",
       "target": "/workspace/app/node_modules",
       "type": "volume"
-    },
-    {
-      "source": "expo-node_modules",
-      "target": "/workspaces/devcontainers/devcontainer/expo/app/node_modules",
-      "type": "volume"
     }
   ],
   "remoteUser": "vscode",
