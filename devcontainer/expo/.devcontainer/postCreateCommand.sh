@@ -32,20 +32,62 @@ else
 fi
 
 echo ""
-echo "Installing project dependencies..."
-if [ -f "/workspace/package.json" ]; then
-    # Try bun install first, fall back to npm if it fails
-    bun install || npm install
-else
-    echo "No package.json found. Skipping dependency install."
-fi
-
-echo ""
-echo "Installing Expo dependencies..."
-if [ -f "/workspace/package.json" ]; then
-    if grep -q "\"expo\"" /workspace/package.json 2>/dev/null || grep -q '"expo"' /workspace/package.json 2>/dev/null; then
-        bun expo install
+echo "Checking for package.json in /workspace/app/"
+ls -la /workspace/app/
+if [ -f "/workspace/app/package.json" ]; then
+    echo "Found package.json, installing dependencies..."
+    
+    # Check if /workspace/app/node_modules is a volume mount and fix permissions if needed
+    if mount | grep -q "/workspace/app/node_modules"; then
+        echo "✓ node_modules is mounted as a volume"
+        # Fix permissions on the volume mount so that vscode user can write to it
+        echo "Setting permissions on node_modules volume..."
+        sudo chown -R vscode:vscode /workspace/app/node_modules
     fi
+    
+    # Change to app directory and try to install dependencies
+    cd /workspace/app
+    
+    # Try bun install first, fall back to npm if it fails
+    echo "Installing dependencies with bun..."
+    if bun install; then
+        echo "✓ Dependencies installed successfully with bun"
+    else
+        echo "Bun install failed, trying npm..."
+        if npm install; then
+            echo "✓ Dependencies installed successfully with npm"
+        else
+            echo "❌ Both bun and npm install failed"
+            exit 1
+        fi
+    fi
+    
+    # Install Expo dependencies if we have an expo package
+    echo ""
+    echo "Checking for Expo dependencies..."
+    if grep -q "\"expo\"" package.json 2>/dev/null || grep -q '"expo"' package.json 2>/dev/null; then
+        echo "Installing Expo SDK packages..."
+        if bun expo install; then
+            echo "✓ Expo dependencies installed successfully"
+        else
+            echo "Bun expo install failed, trying npx..."
+            if npx expo install; then
+                echo "✓ Expo dependencies installed successfully with npx"
+            else
+                echo "❌ Failed to install Expo dependencies"
+                exit 1
+            fi
+        fi
+    else
+        echo "No Expo dependencies found in package.json"
+    fi
+    
+    # Return to workspace root
+    cd /workspace
+else
+    echo "No package.json found in /workspace/app/. Skipping dependency install."
+    echo "Contents of /workspace/app/:"
+    ls -la /workspace/app/
 fi
 
 echo ""

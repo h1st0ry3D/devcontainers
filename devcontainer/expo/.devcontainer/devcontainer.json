@@ -61,22 +61,29 @@
 			}
 		}
 	},
+  "workspaceFolder": "/workspace",
   "mounts": [
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
     {
-      "source": "${localWorkspaceFolder}/app",
+      "source": "${localWorkspaceFolder}",
       "target": "/workspace",
       "type": "bind",
       "consistency": "cached"
     },
     {
       "source": "expo-node_modules",
-      "target": "/workspace/node_modules",
+      "target": "/workspace/app/node_modules",
+      "type": "volume"
+    },
+    {
+      "source": "expo-node_modules",
+      "target": "/workspaces/devcontainers/devcontainer/expo/app/node_modules",
       "type": "volume"
     }
   ],
-"remoteUser": "vscode",
-"updateRemoteUserUID": true,
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
 	"containerEnv": {
 		"CHOKIDAR_USEPOLLING": "true"
 	}
