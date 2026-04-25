@@ -15,11 +15,11 @@
 			}
 		},
 		{
-			"name": "Debug iOS (Expo)",
+			"name": "Debug iOS (Expo - Metro only, open Simulator on host)",
 			"type": "node",
 			"request": "launch",
 			"runtimeExecutable": "bun",
-			"runtimeArgs": ["expo", "start", "--ios"],
+			"runtimeArgs": ["expo", "start"],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen",

@@ -78,7 +78,6 @@
   ],
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
-  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
 	"containerEnv": {
 		"CHOKIDAR_USEPOLLING": "true"
 	}

@@ -62,26 +62,6 @@ if [ -f "/workspace/app/package.json" ]; then
         fi
     fi
     
-    # Install Expo dependencies if we have an expo package
-    echo ""
-    echo "Checking for Expo dependencies..."
-    if grep -q "\"expo\"" package.json 2>/dev/null || grep -q '"expo"' package.json 2>/dev/null; then
-        echo "Installing Expo SDK packages..."
-        if bun expo install; then
-            echo "✓ Expo dependencies installed successfully"
-        else
-            echo "Bun expo install failed, trying npx..."
-            if npx expo install; then
-                echo "✓ Expo dependencies installed successfully with npx"
-            else
-                echo "❌ Failed to install Expo dependencies"
-                exit 1
-            fi
-        fi
-    else
-        echo "No Expo dependencies found in package.json"
-    fi
-    
     # Return to workspace root
     cd /workspace
 else
@@ -89,6 +69,34 @@ else
     echo "Contents of /workspace/app/:"
     ls -la /workspace/app/
 fi
+
+echo ""
+echo "Fixing React Native DevTools sandbox permissions..."
+if [ -f /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh ]; then
+    sudo /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh
+    echo "✓ Chrome sandbox permissions fixed"
+fi
+
+# Ensure dotslash temp directories exist
+mkdir -p /tmp/dotslash-1000 /home/vscode/.cache/dotslash
+
+# Kill any existing watchers to prevent duplicates
+sudo pkill -f "watch-chrome-sandbox.sh" 2>/dev/null || true
+sleep 1
+
+# Start background watcher
+echo "Starting chrome-sandbox permission watcher..."
+nohup sudo bash /usr/local/share/devcontainer-fixes/watch-chrome-sandbox.sh > /dev/null 2>&1 &
+echo "✓ Watcher started"
+
+# Also fix any existing sandbox files in /tmp immediately
+find /tmp/dotslash-1000 -name "chrome-sandbox" -type f 2>/dev/null | while read -r sandbox; do
+    if [ -f "$sandbox" ]; then
+        sudo chown root:root "$sandbox" 2>/dev/null || true
+        sudo chmod 4755 "$sandbox" 2>/dev/null || true
+        echo "✓ Fixed existing sandbox: $sandbox"
+    fi
+done
 
 echo ""
 echo "Verifying Android SDK..."
@@ -113,7 +121,8 @@ echo ""
 echo "To run Expo app:"
 echo "  bun expo start"
 echo ""
-echo "For development builds (dev client):"
+echo "For Android development builds (dev client):"
 echo "  bun expo run:android"
-echo "  bun expo run:ios"
+echo ""
+echo "For iOS: Start Metro in container, then open Simulator on macOS host"
 echo "=========================================="

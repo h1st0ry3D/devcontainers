@@ -11,6 +11,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     unzip \
     git \
     ca-certificates \
+    sudo \
     libatk-bridge2.0-0 \
     libgtk-3-0 \
     libxss1 \
@@ -57,6 +58,42 @@ ENV REACT_NATIVE_DEBUGGER_DISABLED=true
 
 # Increase Node memory limit for large builds
 ENV NODE_OPTIONS=--max-old-space-size=4096
+
+# Fix for React Native DevTools sandbox issue in containers
+# Create scripts to fix chrome-sandbox permissions dynamically
+RUN mkdir -p /usr/local/share/devcontainer-fixes && \
+    printf '%s\n' '#!/bin/bash' \
+    '# Fix chrome-sandbox permissions for React Native DevTools' \
+    'find /home /tmp -name "chrome-sandbox" -type f 2>/dev/null | while read -r sandbox; do' \
+    '    if [ -f "$sandbox" ]; then' \
+    '        sudo chown root:root "$sandbox" 2>/dev/null || true' \
+    '        sudo chmod 4755 "$sandbox" 2>/dev/null || true' \
+    '    fi' \
+    'done' > /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh && \
+    chmod +x /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh
+
+# Add sudoers rule for vscode to run chrome-sandbox fix without password
+RUN echo "vscode ALL=(ALL) NOPASSWD: /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh" > /etc/sudoers.d/vscode-chrome-sandbox && \
+    chmod 440 /etc/sudoers.d/vscode-chrome-sandbox
+
+# Install inotify-tools for watching file creation
+RUN apt-get update && apt-get install -y inotify-tools && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# Create background watcher script for chrome-sandbox files
+RUN printf '%s\n' '#!/bin/bash' \
+    '# Watch for chrome-sandbox creation and fix permissions immediately' \
+    'mkdir -p /tmp/dotslash-1000 /home/vscode/.cache/dotslash' \
+    'inotifywait -m -r -e create /tmp/dotslash-1000 /home/vscode/.cache/dotslash --format "%w%f" 2>/dev/null | while read -r file; do' \
+    '    if [[ "$file" == *"chrome-sandbox" ]]; then' \
+    '        sleep 0.5' \
+    '        sudo chown root:root "$file" 2>/dev/null || true' \
+    '        sudo chmod 4755 "$file" 2>/dev/null || true' \
+    '    fi' \
+    'done' > /usr/local/share/devcontainer-fixes/watch-chrome-sandbox.sh && \
+    chmod +x /usr/local/share/devcontainer-fixes/watch-chrome-sandbox.sh
+
+# Add chrome-sandbox fix to bashrc so it runs for every new shell
+RUN echo 'if [ -f /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh ]; then /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh >/dev/null 2>&1; fi' >> /etc/bash.bashrc
 
 # Verify installations
 RUN echo "Node version: $(node --version)" && \

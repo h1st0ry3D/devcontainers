@@ -32,10 +32,10 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Start iOS",
+			"label": "Start iOS (Metro only - open Simulator on host)",
 			"type": "shell",
 			"command": "bun",
-			"args": ["expo", "start", "--ios"],
+			"args": ["expo", "start"],
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -58,7 +58,20 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Build Android (Dev Client)",
+			"label": "Start Metro (Dev Client)",
+			"type": "shell",
+			"command": "bun",
+			"args": ["expo", "start", "--dev-client"],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Android (Dev Client - local)",
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "run:android"],
@@ -71,10 +84,10 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Build iOS (Dev Client)",
+			"label": "Build iOS (Dev Client - macOS host)",
 			"type": "shell",
-			"command": "bun",
-			"args": ["expo", "run:ios"],
+			"command": "echo",
+			"args": ["To build iOS dev client locally:\n1. Run 'Prebuild' task in container first\n2. On your Mac host, run: ./scripts/build-ios-host.sh\n\nThis temporarily installs node_modules on host for Xcode/CocoaPods, then opens Xcode for you to build."],
 			"group": "build",
 			"presentation": {
 				"echo": true,
