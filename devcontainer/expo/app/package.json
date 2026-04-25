@@ -1,45 +1,43 @@
 {
-  "name": "expo-55",
-  "main": "expo-router/entry",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "expo lint"
-  },
-  "dependencies": {
-    "@react-navigation/bottom-tabs": "7.15.5",
-    "@react-navigation/elements": "2.9.10",
-    "@react-navigation/native": "7.1.33",
-    "expo": "55.0.15",
-    "expo-constants": "55.0.14",
-    "expo-device": "55.0.15",
-    "expo-font": "55.0.6",
-    "expo-glass-effect": "55.0.10",
-    "expo-image": "55.0.8",
-    "expo-linking": "55.0.13",
-    "expo-router": "55.0.12",
-    "expo-splash-screen": "55.0.18",
-    "expo-status-bar": "55.0.5",
-    "expo-symbols": "55.0.7",
-    "expo-system-ui": "55.0.15",
-    "expo-web-browser": "55.0.14",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-native": "0.83.4",
-    "react-native-gesture-handler": "2.30.0",
-    "react-native-worklets": "0.7.2",
-    "react-native-reanimated": "4.2.1",
-    "react-native-safe-area-context": "5.6.2",
-    "react-native-screens": "4.23.0",
-    "react-native-web": "0.21.0"
-  },
-  "devDependencies": {
-    "@types/react": "19.2.2",
-    "typescript": "5.9.2"
-  },
-  "private": true
+	"name": "expo-55",
+	"main": "expo-router/entry",
+	"version": "1.0.0",
+	"scripts": {
+		"start": "expo start",
+		"reset-project": "node ./scripts/reset-project.js",
+		"android": "expo start --android",
+		"ios": "expo start --ios",
+		"web": "expo start --web",
+		"lint": "expo lint",
+		"prebuild:ios": "expo prebuild --platform ios && echo '\\n Prebuild complete. Now run the following on your macOS host to install CocoaPods and open Xcode:' && echo '  ./scripts/build-ios-host.sh'"
+  }	  "	pendencies": {
+   		eact-navigation/bottom-tabs": "7.15.5",
+   		eact-navigation/elements": "2.9.10",
+   		eact-navigation/native": "7.1.33",
+   		po": "55.0.15",
+   		po-constants": "55.0.14",
+   		po-device": "55.0.15",
+   		po-font": "55.0.6",
+   		po-glass-effect": "55.0.10",
+   		po-image": "55.0.8",
+   		po-linking": "55.0.13",
+   		po-router": "55.0.12",
+   		po-splash-screen": "55.0.18",
+   		po-status-bar": "55.0.5",
+   		po-symbols": "55.0.7",
+   		po-system-ui": "55.0.15",
+   		po-web-browser": "55.0.14",
+   		act": "19.2.0",
+   		act-dom": "19.2.0",
+   		act-native": "0.83.4",
+   		act-native-gesture-handler": "2.30.0",
+   		act-native-worklets": "0.7.2",
+   		act-native-reanimated": "4.2.1",
+   		act-native-safe-area-context": "5.6.2",
+   		act-native-screens": "4.23.0",
+   		act-native-web": "0.21.0"
+  }	  "	vDependencies": {
+   		ypes/react": "19.2.2",
+   		pescript": "5.9.2"
+  }	  "	ivate": true
 }
