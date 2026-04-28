@@ -1,4 +1,9 @@
 {
+	"docker.dockerPath": "/opt/podman/bin/podman",
+	"docker.host": "unix:///var/run/docker.sock",
+	"dev.containers.dockerPath": "/opt/podman/bin/podman",
+	"dev.containers.dockerSocketPath": "/var/run/docker.sock",
+	"containers.containerCommand": "/opt/podman/bin/podman",
 	"npm.packageManager": "bun",
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"editor.formatOnSave": true,
