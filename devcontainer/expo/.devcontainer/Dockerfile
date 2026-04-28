@@ -1,5 +1,22 @@
 FROM mcr.microsoft.com/devcontainers/base:bookworm
 
+# Optional: trust custom/corporate CAs placed in .devcontainer/certs
+# (e.g. ZscalerRootCA.pem). These files are copied from build context.
+COPY certs /tmp/devcontainer-certs
+
+# Register custom CA certs before any external HTTPS downloads.
+RUN set -eux; \
+    if [ -d /tmp/devcontainer-certs ]; then \
+        mkdir -p /usr/local/share/ca-certificates/devcontainer-custom; \
+        find /tmp/devcontainer-certs -type f \( -name '*.crt' -o -name '*.pem' \) | while read -r cert; do \
+            cert_name="$(basename "$cert")"; \
+            cp "$cert" "/usr/local/share/ca-certificates/devcontainer-custom/${cert_name%.*}.crt"; \
+        done; \
+        if [ "$(find /usr/local/share/ca-certificates/devcontainer-custom -type f | wc -l)" -gt 0 ]; then \
+            update-ca-certificates; \
+        fi; \
+    fi
+
 # Install dependencies for Android development
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y --no-install-recommends \
@@ -21,10 +38,21 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     libasound2 \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 22.x (LTS)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@11.1.0
+# Install Node.js
+# Prefer NodeSource 22.x, but fall back to Debian packages when HTTPS interception
+# (e.g. corporate proxy) prevents validating NodeSource certificates.
+RUN set -eux; \
+    if curl -fsSL https://deb.nodesource.com/setup_22.x -o /tmp/nodesource_setup.sh; then \
+        bash /tmp/nodesource_setup.sh; \
+        apt-get install -y --no-install-recommends nodejs; \
+        npm install -g npm@11.1.0; \
+    else \
+        echo "Warning: NodeSource setup failed, falling back to Debian nodejs/npm packages"; \
+        apt-get update; \
+        apt-get install -y --no-install-recommends nodejs npm; \
+    fi; \
+    rm -f /tmp/nodesource_setup.sh; \
+    apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install Bun 1.2.4
 ENV BUN_VERSION=1.2.4

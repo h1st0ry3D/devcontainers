@@ -7,7 +7,9 @@ get_ip() {
             ;;
         darwin*)
             # macOS - get the primary IP
-            ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || hostname -I | awk '{print $1}'
+            ipconfig getifaddr en0 2>/dev/null \
+                || ipconfig getifaddr en1 2>/dev/null \
+                || ifconfig | awk '/inet / && $2 != "127.0.0.1" {print $2; exit}'
             ;;
         *)
             hostname -I | awk '{print $1}'
