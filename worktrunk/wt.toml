@@ -3,4 +3,4 @@ copy = "wt step copy-ignored"
 install = "bun install --frozen-lockfile"
 
 [step.copy-ignored]
-exclude = ["node_modules/"]
+exclude = ["node_modules/", "ios/", "android/", ".expo/"]
