@@ -26,7 +26,7 @@ This guide explains how to run your Android emulator on the host machine while t
 ## Prerequisites
 
 - **Host**: Android Studio with Emulator or standalone Android Emulator installed
-- **Container**: Already set up with `expo-cli`, `adb`, and build tools
+- **Container**: Already set up with Expo CLI via `bun expo`, `adb`, and Android build tools
 - **Network**: Container must reach host via `host.docker.internal` (configured in devcontainer.json)
 
 ## Step-by-Step Setup
@@ -176,7 +176,7 @@ echo "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig getifaddr en0)" > .devcontainer/
    ```bash
    # Verify host-gateway is reachable
    podman run -it --add-host=host.docker.internal:host-gateway \
-     mcr.microsoft.com/devcontainers/base:bookworm \
+          mcr.microsoft.com/devcontainers/typescript-node:4.0.1-20-bookworm \
      ping -c 1 host.docker.internal
    ```
 

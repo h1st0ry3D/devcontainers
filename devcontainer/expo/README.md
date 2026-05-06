@@ -1,13 +1,15 @@
 # Expo Dev Container (React Native)
 
-> 📱 Complete development environment for Expo/React Native with isolated dependencies
+> 📱 Expo/React Native development environment based on the official TypeScript + Node 20 devcontainer image, with Bun provided by a devcontainer Feature and Android tooling layered on top.
 
 ## 🚀 Quick Start
 
 1. Open in VS Code
 2. Press `Cmd+Shift+P` → **"Dev Containers: Reopen in Container"**
-3. Wait for build (first time ~2-3 minutes)
+3. Wait for build (the image uses `mcr.microsoft.com/devcontainers/typescript-node:4.0.1-20-bookworm` as its base)
 4. Dependencies auto-install in an isolated Podman-managed volume
+
+If you use Podman, the devcontainer now starts with `--userns=keep-id` so the container user can write to the bind-mounted workspace reliably.
 
 ## 📁 Project Structure
 
@@ -40,7 +42,7 @@ This devcontainer stores `node_modules` in a **Podman-managed volume** - not on 
 | Location | `node_modules` Status |
 |----------|---------------------|
 | **Host (your Mac)** | ❌ Empty directory (mount point only) |
-| **Container** | ✅ 391+ packages (actual dependencies) |
+| **Container** | ✅ App dependencies (actual install location) |
 
 **Never run `bun install` on your host** - use the container terminal instead!
 
@@ -60,11 +62,13 @@ If a host process is already using `8081`, the devcontainer can now still start,
 
 ## 🛠️ Tech Stack
 
-- ⚡ Bun (JavaScript runtime & package manager)
+- 🟢 Node.js 20 LTS + TypeScript devcontainer base image
+- ⚡ Bun 1.2.4 devcontainer Feature (JavaScript runtime & package manager)
 - 📱 Expo SDK 55
 - ⚛️ React Native 0.83
 - 🐳 Dev Container (Debian Bookworm)
 - ☕ Java 17 (for Android builds)
+- 🤖 Android SDK command-line tools, platform 36, build tools 35/36, and NDK 27
 
 ---
 

@@ -4,6 +4,11 @@
 		"dockerfile": "Dockerfile",
 		"context": ".."
 	},
+	"features": {
+		"ghcr.io/devcontainers-extra/features/bun:1": {
+			"version": "1.2.4"
+		}
+	},
 	"forwardPorts": [8081, 19000, 19001, 19002, 19006],
 	"portsAttributes": {
 		"8081": {
@@ -29,6 +34,7 @@
 	},
 	"runArgs": [
 		"--tmpfs=/tmp:rw,exec,nosuid,nodev,mode=1777",
+		"--userns=keep-id",
 		"--add-host=host.docker.internal:host-gateway",
 		"--env-file",
 		".devcontainer/.env"
@@ -67,7 +73,7 @@
 			"type": "volume"
 		}
 	],
-	"remoteUser": "vscode",
+	"remoteUser": "node",
 	"updateRemoteUserUID": true,
 	"containerEnv": {
 		"CHOKIDAR_USEPOLLING": "true"

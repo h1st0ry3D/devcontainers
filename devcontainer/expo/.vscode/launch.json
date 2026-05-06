@@ -7,7 +7,7 @@
 			"request": "launch",
 			"runtimeExecutable": "bun",
 			"runtimeArgs": ["expo", "start", "--android"],
-			"cwd": "${workspaceFolder}",
+			"cwd": "${workspaceFolder}/app",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen",
 			"env": {
@@ -20,7 +20,7 @@
 			"request": "launch",
 			"runtimeExecutable": "bun",
 			"runtimeArgs": ["expo", "start"],
-			"cwd": "${workspaceFolder}",
+			"cwd": "${workspaceFolder}/app",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen",
 			"env": {
@@ -33,7 +33,7 @@
 			"request": "launch",
 			"runtimeExecutable": "bun",
 			"runtimeArgs": ["expo", "start", "--web"],
-			"cwd": "${workspaceFolder}",
+			"cwd": "${workspaceFolder}/app",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen"
 		},

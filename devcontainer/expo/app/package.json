@@ -2,6 +2,11 @@
 	"name": "expo-55",
 	"main": "expo-router/entry",
 	"version": "1.0.0",
+	"packageManager": "bun@1.2.4",
+	"engines": {
+		"node": ">=20 <21",
+		"bun": ">=1.2.4"
+	},
 	"scripts": {
 		"start": "expo start",
 		"reset-project": "node ./scripts/reset-project.js",

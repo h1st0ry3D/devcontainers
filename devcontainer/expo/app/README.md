@@ -1,15 +1,17 @@
 # Expo Dev Container (React Native)
 
-A complete development environment for Expo/React Native with Bun, optimized for ARM64 Mac (Apple Silicon) with support for Android and iOS development.
+A complete development environment for Expo/React Native with TypeScript, Node.js 20 LTS, and Bun, optimized for ARM64 Mac (Apple Silicon) with support for Android and iOS development.
 
 ## Features
 
-- ⚡ **Bun** - Fast JavaScript runtime and package manager
+- 🟢 **Node.js 20 LTS + TypeScript** - Provided by `mcr.microsoft.com/devcontainers/typescript-node:4.0.1-20-bookworm`
+- ⚡ **Bun 1.2.4** - Installed via a devcontainer Feature for simpler container maintenance
 - 📱 **iOS + Android** - Support for both platforms
 - 🐳 **Dev Container** - Consistent, isolated environment
 - 🍎 **ARM64 Optimized** - Native Apple Silicon support
 - 🔒 **Isolated Dependencies** - `node_modules` stored in a Podman-managed volume (not on host)
 - 🔧 **Pre-configured** - VS Code tasks and debug configs included
+- 🪝 **Podman-friendly mounts** - `--userns=keep-id` helps keep the bind-mounted workspace writable from inside the container
 
 ## Quick Start
 
@@ -26,7 +28,7 @@ A complete development environment for Expo/React Native with Bun, optimized for
 .
 ├── .devcontainer/          # Dev container configuration
 │   ├── devcontainer.json   # Container settings
-│   ├── Dockerfile          # Container image definition
+│   ├── Dockerfile          # Android/Bun layers on top of the TypeScript + Node 20 base image
 │   ├── postCreateCommand.sh # Post-create setup (auto-installs deps)
 │   └── .env               # Auto-generated host IP
 ├── app/                   # Your Expo/React Native app
@@ -42,7 +44,7 @@ A complete development environment for Expo/React Native with Bun, optimized for
 
 ### 3. Install Dependencies
 
-The container **automatically installs dependencies** on first launch via `postCreateCommand`. If you need to reinstall:
+The container **automatically installs dependencies** on first launch via `postCreateCommand`. If `bun.lock` is present, installs use `--frozen-lockfile` for reproducibility. If you need to reinstall:
 
 ```bash
 cd app
@@ -59,7 +61,9 @@ Press `Cmd+Shift+P` → **"Tasks: Run Task"** and select:
 |------|-------------|
 | **Start Metro (Expo)** | Start the Metro bundler |
 | **Start Android** | Start Android development build |
-| **Start iOS** | Start iOS development build (macOS host only) |
+| **Start iOS (Metro only - open Simulator on host)** | Start Metro for iOS while you open the Simulator on your macOS host |
+| **Start Web** | Start Expo for the web target |
+| **Start Metro (Dev Client)** | Start Metro for a custom Expo dev client |
 | **Connect Android Emulator** | Connect to host Android emulator |
 
 Or use the keyboard shortcut: `Cmd+Shift+B` (runs default task - Start Metro)
@@ -75,8 +79,8 @@ bun expo start
 # Start with Android
 bun expo start --android
 
-# Start with iOS (macOS only)
-bun expo start --ios
+# Start Metro for iOS (open Simulator on your macOS host separately)
+bun expo start
 
 # Start with Web
 bun expo start --web
@@ -158,10 +162,10 @@ adb connect host.docker.internal:5555
    In the devcontainer:
    ```bash
    cd app
-   bun expo start --ios
+   bun expo start
    ```
    
-   Or press `i` in the Metro terminal
+   Then open Expo Go or your dev client in the booted Simulator on the host.
 
 ### How It Works
 
@@ -193,7 +197,7 @@ This devcontainer stores `node_modules` in a **Podman-managed volume** that is i
 | Location | `node_modules` | Description |
 |----------|---------------|-------------|
 | **Host** | Empty directory | Podman mount point (in `.gitignore`) |
-| **Container** | 391+ packages | Actual dependencies in the Podman volume |
+| **Container** | App dependencies | Actual dependencies in the Podman volume |
 
 ### Benefits
 
@@ -216,6 +220,20 @@ The devcontainer mounts a Podman volume at `/workspace/app/node_modules`:
 
 All `bun install` / `npm install` operations write to this volume, **not** your host disk.
 
+### Resetting Dependencies
+
+Do not delete the `node_modules` directory itself from inside the container. It is a mounted volume, so `rm -rf node_modules` can fail with `Device or resource busy` because that path is the mountpoint.
+
+To reset dependencies, clear the volume contents and reinstall from inside the container:
+
+```bash
+cd /workspace/app
+rm -rf node_modules/* node_modules/.[!.]* node_modules/..?*
+bun install --frozen-lockfile
+```
+
+If the volume itself is broken, rebuild/reopen the devcontainer so the named volume is recreated and dependencies are installed by `postCreateCommand`.
+
 ## Debugging
 
 ### VS Code Debugger
@@ -223,7 +241,7 @@ All `bun install` / `npm install` operations write to this volume, **not** your 
 Press `F5` or go to **Run and Debug** panel:
 
 - **Debug Android (Expo)** - Launch with debugger attached
-- **Debug iOS (Expo)** - Launch with debugger attached
+- **Debug iOS (Expo - Metro only, open Simulator on host)** - Start Metro for iOS while using the macOS Simulator on the host
 - **Debug Web (Expo)** - Launch web with debugger
 - **Attach to Metro** - Attach to already running Metro
 
@@ -244,14 +262,14 @@ bun expo prebuild
 # Build Android
 bun expo run:android
 
-# Build iOS (macOS only)
-bun expo run:ios
+# Build iOS on the macOS host after prebuild
+./scripts/build-ios-host.sh
 ```
 
 Or use VS Code tasks:
 - **"Prebuild (Generate Native Code)"**
-- **"Build Android (Dev Client)"**
-- **"Build iOS (Dev Client)"**
+- **"Build Android (Dev Client - container)"**
+- **"Build iOS (Dev Client - macOS host)"**
 
 ## Package Management with Bun
 
@@ -286,6 +304,15 @@ The container automatically sets these:
 | `ANDROID_HOME` | Android SDK location |
 | `CHOKIDAR_USEPOLLING` | File watching mode for containers |
 | `NODE_OPTIONS` | `--max-old-space-size=4096` for large builds |
+
+## Container Image Layout
+
+The devcontainer intentionally uses the official TypeScript/Node image as the parent image:
+
+- Base: `mcr.microsoft.com/devcontainers/typescript-node:4.0.1-20-bookworm`
+- Added in `Dockerfile`: Java 17, Android SDK command-line tools, ADB/Fastboot, and Watchman
+- Added as a Feature: Bun 1.2.4
+- Not added: custom NodeSource setup or global npm replacement, because Node/npm/TypeScript tooling comes from the base image
 
 ## Ports
 
@@ -343,6 +370,10 @@ cmd+shift+p → "Dev Containers: Rebuild and Reopen in Container"
 podman system prune -f
 ```
 
+### "Unable to save file" in VS Code
+
+If Podman bind mounts come in as unwritable inside the container, rebuild/reopen the devcontainer so the `--userns=keep-id` run argument takes effect. That keeps the container user aligned with the mounted workspace permissions.
+
 ## Tips & Best Practices
 
 1. **Always work in `app/` directory** - Your Expo app code is in `app/`, not the project root
@@ -366,7 +397,7 @@ podman system prune -f
 node --version    # Node.js version
 npm --version     # npm version
 bun --version     # Bun version
-expo --version    # Expo CLI version
+bun expo --version    # Expo CLI version
 adb version       # ADB version
 java -version     # Java version
 
