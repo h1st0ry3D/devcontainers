@@ -20,6 +20,11 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
         android-tools-adb \
         android-tools-fastboot \
         watchman \
+        libatk-bridge2.0-0 \
+        libatspi2.0-0 \
+        libgbm1 \
+        libgtk-3-0 \
+        libxkbcommon0 \
         curl unzip git sudo ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
