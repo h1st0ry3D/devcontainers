@@ -6,6 +6,9 @@
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "start"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -23,6 +26,9 @@
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "start", "--android"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -36,6 +42,9 @@
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "start"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -49,6 +58,9 @@
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "start", "--web"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -62,6 +74,9 @@
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "start", "--dev-client"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -71,10 +86,13 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Build Android (Dev Client - local)",
+			"label": "Build Android (Dev Client - container)",
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "run:android"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -87,7 +105,7 @@
 			"label": "Build iOS (Dev Client - macOS host)",
 			"type": "shell",
 			"command": "echo",
-			"args": ["To build iOS dev client locally:\n1. Run 'Prebuild' task in container first\n2. On your Mac host, run: ./scripts/build-ios-host.sh\n\nThis temporarily installs node_modules on host for Xcode/CocoaPods, then opens Xcode for you to build."],
+			"args": ["To build the iOS dev client on macOS without installing npm packages on the host:\n1. Run 'Prebuild iOS (Generate Native Code)' in the container\n2. On your Mac host, run: ./scripts/build-ios-host.sh\n\nThe script copies node_modules out of the running Podman devcontainer, installs CocoaPods on the host, opens Xcode, and cleans up when Xcode closes."],
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -101,6 +119,41 @@
 			"type": "shell",
 			"command": "bun",
 			"args": ["expo", "prebuild"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Prebuild Android (Generate Native Code)",
+			"type": "shell",
+			"command": "bun",
+			"args": ["run", "prebuild:android"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Prebuild iOS (Generate Native Code)",
+			"type": "shell",
+			"command": "bun",
+			"args": ["run", "prebuild:ios"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "build",
 			"presentation": {
 				"echo": true,
@@ -112,8 +165,11 @@
 		{
 			"label": "Connect Android Emulator",
 			"type": "shell",
-			"command": "adb",
-			"args": ["connect", "host.docker.internal:5555"],
+			"command": "bash",
+			"args": ["./scripts/connect-android-emulator-host.sh"],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
 			"group": "none",
 			"presentation": {
 				"echo": true,
@@ -125,6 +181,9 @@
 			"type": "shell",
 			"command": "adb",
 			"args": ["devices"],
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "none",
 			"presentation": {
 				"echo": true,

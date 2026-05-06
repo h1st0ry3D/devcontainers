@@ -1,12 +1,8 @@
 {
 	"name": "Expo (React Native)",
 	"build": {
-		"dockerfile": "Dockerfile"
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/java:1": {
-			"version": "17"
-		}
+		"dockerfile": "Dockerfile",
+		"context": ".."
 	},
 	"forwardPorts": [8081, 19000, 19001, 19002, 19006],
 	"portsAttributes": {
@@ -32,16 +28,13 @@
 		}
 	},
 	"runArgs": [
-		"-p=8081:8081",
-		"-p=19000:19000",
-		"-p=19001:19001",
-		"-p=19002:19002",
-		"-p=19006:19006",
+		"--tmpfs=/tmp:rw,exec,nosuid,nodev,mode=1777",
 		"--add-host=host.docker.internal:host-gateway",
-		"--env-file", 
+		"--env-file",
 		".devcontainer/.env"
 	],
 	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+	"postStartCommand": "bash .devcontainer/postStartCommand.sh",
 	"initializeCommand": "bash .devcontainer/initializeCommand.sh",
 	"customizations": {
 		"vscode": {
@@ -61,23 +54,21 @@
 			}
 		}
 	},
-  "workspaceFolder": "/workspace",
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-    {
-      "source": "${localWorkspaceFolder}",
-      "target": "/workspace",
-      "type": "bind",
-      "consistency": "cached"
-    },
-    {
-      "source": "expo-node_modules",
-      "target": "/workspace/app/node_modules",
-      "type": "volume"
-    }
-  ],
-  "remoteUser": "vscode",
-  "updateRemoteUserUID": true,
+	"workspaceFolder": "/workspace",
+	"mounts": [
+		{
+			"source": "${localWorkspaceFolder}",
+			"target": "/workspace",
+			"type": "bind"
+		},
+		{
+			"source": "expo-node_modules",
+			"target": "/workspace/app/node_modules",
+			"type": "volume"
+		}
+	],
+	"remoteUser": "vscode",
+	"updateRemoteUserUID": true,
 	"containerEnv": {
 		"CHOKIDAR_USEPOLLING": "true"
 	}

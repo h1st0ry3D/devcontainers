@@ -7,7 +7,7 @@
 1. Open in VS Code
 2. Press `Cmd+Shift+P` → **"Dev Containers: Reopen in Container"**
 3. Wait for build (first time ~2-3 minutes)
-4. Dependencies auto-install in isolated Docker volume
+4. Dependencies auto-install in an isolated Podman-managed volume
 
 ## 📁 Project Structure
 
@@ -17,7 +17,7 @@
 ├── app/               # Your Expo/React Native app
 │   ├── package.json
 │   ├── src/
-│   └── node_modules/  # 🐳 Docker volume (isolated from host)
+│   └── node_modules/  # 🐳 Podman volume (isolated from host)
 ├── .vscode/           # VS Code settings
 └── README.md          # 📖 Full documentation in app/README.md
 ```
@@ -35,7 +35,7 @@ See **[app/README.md](app/README.md)** for complete documentation including:
 
 ## 🔒 Security: Isolated Dependencies
 
-This devcontainer stores `node_modules` in a **Docker volume** - not on your host filesystem:
+This devcontainer stores `node_modules` in a **Podman-managed volume** - not on your host filesystem:
 
 | Location | `node_modules` Status |
 |----------|---------------------|
@@ -46,7 +46,7 @@ This devcontainer stores `node_modules` in a **Docker volume** - not on your hos
 
 ## 🌐 Port Forwarding
 
-The container forwards these ports for simulator/emulator communication:
+VS Code forwards these ports after the devcontainer attaches, so container startup does not depend on the host ports already being free:
 
 | Port | Service |
 |------|---------|
@@ -55,6 +55,8 @@ The container forwards these ports for simulator/emulator communication:
 | 19001 | React Native Debugger |
 | 19002 | Expo Dev Client |
 | 19006 | Expo Web |
+
+If a host process is already using `8081`, the devcontainer can now still start, but you should stop that process before running Metro if your simulator or emulator needs Metro on the default host port.
 
 ## 🛠️ Tech Stack
 

@@ -1,128 +1,29 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+
+APP_DIR="/workspace/app"
+if [ ! -f "$APP_DIR/package.json" ] && [ -f "/workspace/package.json" ]; then
+	APP_DIR="/workspace"
+fi
 
 echo "=========================================="
-echo " Expo Dev Container - Post Create Setup "
+echo "  Expo Dev Container - Post-Create Setup "
 echo "=========================================="
-
-echo ""
-echo "Running as user: $(whoami)"
-echo "Workspace permissions: $(ls -ld /workspace 2>/dev/null || echo 'cannot access')"
-
-echo ""
 echo "Node version: $(node --version)"
 echo "npm version: $(npm --version)"
 echo "Bun version: $(bun --version)"
 
-echo ""
-echo "Fixing workspace permissions..."
-# updateRemoteUserUID should handle this, but ensure workspace is writable
-if [ ! -w /workspace ]; then
-    echo "Warning: /workspace not writable, attempting fix..."
-    # Try to fix ownership (works if container is restarted with correct UID)
-    chmod 777 /workspace 2>/dev/null || true
-fi
+bash .devcontainer/fixPodmanPermissions.sh "$APP_DIR"
 
-echo ""
-echo "Checking node_modules mount..."
-if mount | grep -q "node_modules.*volume"; then
-    echo "✓ node_modules is on a volume (isolated from host)"
+if [ -f "$APP_DIR/package.json" ]; then
+	echo ""
+	echo "Installing dependencies in $APP_DIR..."
+	cd "$APP_DIR"
+	bun install
+	echo "✓ Dependencies installed"
 else
-    echo "⚠ node_modules may be visible on host (bind mount limitation)"
+	echo "⚠ No package.json found at $APP_DIR; skipping dependency install"
 fi
 
 echo ""
-echo "Checking for package.json in /workspace/app/"
-ls -la /workspace/app/
-if [ -f "/workspace/app/package.json" ]; then
-    echo "Found package.json, installing dependencies..."
-    
-    # Check if /workspace/app/node_modules is a volume mount and fix permissions if needed
-    if mount | grep -q "/workspace/app/node_modules"; then
-        echo "✓ node_modules is mounted as a volume"
-        # Fix permissions on the volume mount so that vscode user can write to it
-        echo "Setting permissions on node_modules volume..."
-        sudo chown -R vscode:vscode /workspace/app/node_modules
-    fi
-    
-    # Change to app directory and try to install dependencies
-    cd /workspace/app
-    
-    # Try bun install first, fall back to npm if it fails
-    echo "Installing dependencies with bun..."
-    if bun install; then
-        echo "✓ Dependencies installed successfully with bun"
-    else
-        echo "Bun install failed, trying npm..."
-        if npm install; then
-            echo "✓ Dependencies installed successfully with npm"
-        else
-            echo "❌ Both bun and npm install failed"
-            exit 1
-        fi
-    fi
-    
-    # Return to workspace root
-    cd /workspace
-else
-    echo "No package.json found in /workspace/app/. Skipping dependency install."
-    echo "Contents of /workspace/app/:"
-    ls -la /workspace/app/
-fi
-
-echo ""
-echo "Fixing React Native DevTools sandbox permissions..."
-if [ -f /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh ]; then
-    sudo /usr/local/share/devcontainer-fixes/fix-chrome-sandbox.sh
-    echo "✓ Chrome sandbox permissions fixed"
-fi
-
-# Ensure dotslash temp directories exist
-mkdir -p /tmp/dotslash-1000 /home/vscode/.cache/dotslash
-
-# Kill any existing watchers to prevent duplicates
-sudo pkill -f "watch-chrome-sandbox.sh" 2>/dev/null || true
-sleep 1
-
-# Start background watcher
-echo "Starting chrome-sandbox permission watcher..."
-nohup sudo bash /usr/local/share/devcontainer-fixes/watch-chrome-sandbox.sh > /dev/null 2>&1 &
-echo "✓ Watcher started"
-
-# Also fix any existing sandbox files in /tmp immediately
-find /tmp/dotslash-1000 -name "chrome-sandbox" -type f 2>/dev/null | while read -r sandbox; do
-    if [ -f "$sandbox" ]; then
-        sudo chown root:root "$sandbox" 2>/dev/null || true
-        sudo chmod 4755 "$sandbox" 2>/dev/null || true
-        echo "✓ Fixed existing sandbox: $sandbox"
-    fi
-done
-
-echo ""
-echo "Verifying Android SDK..."
-if command -v adb &> /dev/null; then
-    echo "ADB installed: $(adb version)"
-else
-    echo "Note: ADB not found in container. For Android development, use:"
-    echo "  adb connect host.docker.internal:5555"
-fi
-
-echo ""
-echo "=========================================="
-echo " Dev container ready! "
-echo "=========================================="
-echo ""
-echo "Available tools:"
-echo "  node $(node --version)"
-echo "  npm $(npm --version)"
-echo "  bun $(bun --version)"
-echo "  expo $(expo --version 2>/dev/null || echo 'not found')"
-echo ""
-echo "To run Expo app:"
-echo "  bun expo start"
-echo ""
-echo "For Android development builds (dev client):"
-echo "  bun expo run:android"
-echo ""
-echo "For iOS: Start Metro in container, then open Simulator on macOS host"
-echo "=========================================="
+echo "✓ Post-create setup complete"

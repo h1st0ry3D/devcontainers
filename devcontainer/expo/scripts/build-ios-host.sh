@@ -1,70 +1,125 @@
 #!/bin/bash
-# Build iOS dev-client on macOS host (helper for Linux container workflow)
-#
-# The devcontainer runs Linux, so it cannot compile iOS apps with Xcode.
-# This script temporarily installs node_modules on the HOST macOS filesystem
-# so CocoaPods can resolve dependencies, then cleans them up automatically.
-#
-# Usage:
-#   cd /Users/heiko/Git/devcontainers/devcontainer/expo
-#   ./scripts/build-ios-host.sh
+# Build the iOS dev client on macOS using dependencies copied from the running
+# Podman devcontainer, so the host never runs npm/bun install.
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "$SCRIPT_DIR/../app" && pwd)"
 HOST_NODE_MODULES="$APP_DIR/node_modules"
+PODMAN_BIN="${PODMAN_BIN:-/opt/podman/bin/podman}"
+TEMP_ROOT=""
+RESTORE_ORIGINAL_NODE_MODULES=0
+ORIGINAL_NODE_MODULES_BACKUP=""
 
-# ─── Validation ──────────────────────────────────────────────────
+normalize_ios_permissions() {
+    if [ -d "$APP_DIR/ios" ]; then
+        chmod -R o+rwX "$APP_DIR/ios" 2>/dev/null || true
+    fi
+}
+
+cleanup() {
+    local exit_code=$?
+
+    if [ -L "$HOST_NODE_MODULES" ]; then
+        rm -f "$HOST_NODE_MODULES"
+    fi
+
+    if [ "$RESTORE_ORIGINAL_NODE_MODULES" -eq 1 ] && [ -n "$ORIGINAL_NODE_MODULES_BACKUP" ] && [ -e "$ORIGINAL_NODE_MODULES_BACKUP" ]; then
+        mv "$ORIGINAL_NODE_MODULES_BACKUP" "$HOST_NODE_MODULES"
+    elif [ ! -e "$HOST_NODE_MODULES" ]; then
+        mkdir -p "$HOST_NODE_MODULES"
+    fi
+
+    if [ -n "$TEMP_ROOT" ] && [ -d "$TEMP_ROOT" ]; then
+        rm -rf "$TEMP_ROOT"
+    fi
+
+    exit "$exit_code"
+}
+
+trap cleanup EXIT
 
 if [[ "$OSTYPE" != "darwin"* ]]; then
     echo "❌ Error: This script must run on macOS (host), not in the Linux container."
     exit 1
 fi
 
-if ! command -v xcodebuild &> /dev/null; then
+if ! command -v "$PODMAN_BIN" >/dev/null 2>&1; then
+    echo "❌ Error: Podman not found at $PODMAN_BIN"
+    exit 1
+fi
+
+if ! command -v xcodebuild >/dev/null 2>&1; then
     echo "❌ Error: Xcode not found. Install Xcode from the App Store."
+    exit 1
+fi
+
+if ! command -v pod >/dev/null 2>&1; then
+    echo "❌ Error: CocoaPods not found. Install it first (for example: brew install cocoapods)."
     exit 1
 fi
 
 if [ ! -d "$APP_DIR/ios" ]; then
     echo "❌ Error: ios/ directory not found."
-    echo "   Run this first in the container: cd app && bun expo prebuild --platform ios"
+    echo "   Run this first in the container: cd app && bun run prebuild:ios"
     exit 1
 fi
 
-# ─── Temporary host node_modules ──────────────────────────────
-
-if [ -d "$HOST_NODE_MODULES" ] && [ -n "$(ls -A "$HOST_NODE_MODULES" 2>/dev/null)" ]; then
-    echo "⚠️  Existing host node_modules found. Removing for clean install..."
-    rm -rf "$HOST_NODE_MODULES"
+CONTAINER_ID="$($PODMAN_BIN ps --filter volume=expo-node_modules --format '{{.ID}}' | head -n1)"
+if [ -z "$CONTAINER_ID" ]; then
+    echo "❌ Error: No running Podman devcontainer found."
+    echo "   Start or reopen the devcontainer in VS Code, then try again."
+    exit 1
 fi
 
-echo "📦 Installing temporary node_modules on host for CocoaPods..."
-cd "$APP_DIR"
-npm install
+CONTAINER_APP_DIR="/workspace/app"
+if ! "$PODMAN_BIN" exec "$CONTAINER_ID" test -f "$CONTAINER_APP_DIR/package.json"; then
+    CONTAINER_APP_DIR="/workspace"
+fi
 
-# ─── CocoaPods ──────────────────────────────────────────────────
+if ! "$PODMAN_BIN" exec "$CONTAINER_ID" test -f "$CONTAINER_APP_DIR/package.json"; then
+    echo "❌ Error: Could not find package.json inside the running devcontainer."
+    exit 1
+fi
 
-echo "📦 Running pod install..."
+if ! "$PODMAN_BIN" exec "$CONTAINER_ID" test -f "$CONTAINER_APP_DIR/node_modules/expo/package.json"; then
+    echo "📦 Container dependencies are missing; installing them inside the running Podman devcontainer..."
+    "$PODMAN_BIN" exec -u vscode "$CONTAINER_ID" sh -lc "cd '$CONTAINER_APP_DIR' && bun install"
+fi
+
+TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/expo-ios-host.XXXXXX")"
+
+if [ -L "$HOST_NODE_MODULES" ]; then
+    ORIGINAL_NODE_MODULES_BACKUP="$TEMP_ROOT/original-node_modules"
+    mv "$HOST_NODE_MODULES" "$ORIGINAL_NODE_MODULES_BACKUP"
+    RESTORE_ORIGINAL_NODE_MODULES=1
+elif [ -d "$HOST_NODE_MODULES" ] && [ -n "$(ls -A "$HOST_NODE_MODULES" 2>/dev/null)" ]; then
+    ORIGINAL_NODE_MODULES_BACKUP="$TEMP_ROOT/original-node_modules"
+    mv "$HOST_NODE_MODULES" "$ORIGINAL_NODE_MODULES_BACKUP"
+    RESTORE_ORIGINAL_NODE_MODULES=1
+elif [ -d "$HOST_NODE_MODULES" ]; then
+    rmdir "$HOST_NODE_MODULES" 2>/dev/null || rm -rf "$HOST_NODE_MODULES"
+fi
+
+echo "📦 Copying node_modules from Podman container $CONTAINER_ID..."
+"$PODMAN_BIN" cp "$CONTAINER_ID:$CONTAINER_APP_DIR/node_modules" "$TEMP_ROOT"
+ln -s "$TEMP_ROOT/node_modules" "$HOST_NODE_MODULES"
+
+echo "📦 Running pod install using dependencies copied from the container..."
 cd "$APP_DIR/ios"
-if command -v pod &> /dev/null; then
-    pod install
-else
-    echo "❌ Error: CocoaPods not found. Install it: sudo gem install cocoapods"
+pod install
+normalize_ios_permissions
+
+XCODE_WORKSPACE="$(find "$APP_DIR/ios" -maxdepth 1 -name '*.xcworkspace' | head -n1)"
+if [ -z "$XCODE_WORKSPACE" ]; then
+    echo "❌ Error: No .xcworkspace found after pod install."
     exit 1
 fi
 
-# ─── Cleanup (automatic) ──────────────────────────────────────────
-
-echo "🧹 Cleaning up temporary host node_modules..."
-rm -rf "$HOST_NODE_MODULES"
-echo "✓ Host node_modules removed. Container node_modules (Docker volume) is untouched."
-
-# ─── Open Xcode ─────────────────────────────────────────────────
-
 echo ""
-echo "🚀 Opening Xcode..."
-echo "   Select a Simulator and press Cmd+B (build) / Cmd+R (run)."
+echo "🚀 Opening Xcode and keeping temporary node_modules available until Xcode closes..."
+echo "   Build/run in Xcode, then quit Xcode to trigger automatic cleanup."
 echo ""
-open "$APP_DIR/ios"/*.xcworkspace
+open -a Xcode -W "$XCODE_WORKSPACE"
+normalize_ios_permissions

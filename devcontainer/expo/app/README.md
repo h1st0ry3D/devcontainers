@@ -8,7 +8,7 @@ A complete development environment for Expo/React Native with Bun, optimized for
 - 📱 **iOS + Android** - Support for both platforms
 - 🐳 **Dev Container** - Consistent, isolated environment
 - 🍎 **ARM64 Optimized** - Native Apple Silicon support
-- 🔒 **Isolated Dependencies** - `node_modules` stored in Docker volume (not on host)
+- 🔒 **Isolated Dependencies** - `node_modules` stored in a Podman-managed volume (not on host)
 - 🔧 **Pre-configured** - VS Code tasks and debug configs included
 
 ## Quick Start
@@ -32,13 +32,13 @@ A complete development environment for Expo/React Native with Bun, optimized for
 ├── app/                   # Your Expo/React Native app
 │   ├── package.json       # App dependencies
 │   ├── src/               # Source code
-│   ├── node_modules/      # ⚠️  Docker volume (isolated, not on host!)
+│   ├── node_modules/      # ⚠️  Podman volume (isolated, not on host!)
 │   └── ...
 ├── .vscode/               # VS Code settings
 └── README.md              # This file
 ```
 
-**Important:** Your application code lives in the `app/` directory. The `node_modules` folder inside `app/` is stored in a Docker volume and is **not visible on your host filesystem** for security.
+**Important:** Your application code lives in the `app/` directory. The `node_modules` folder inside `app/` is stored in a Podman-managed volume and is **not visible on your host filesystem** for security.
 
 ### 3. Install Dependencies
 
@@ -188,12 +188,12 @@ cat .devcontainer/.env
 
 ## Isolated Dependencies (Security)
 
-This devcontainer stores `node_modules` in a **Docker volume** that is isolated from your host filesystem:
+This devcontainer stores `node_modules` in a **Podman-managed volume** that is isolated from your host filesystem:
 
 | Location | `node_modules` | Description |
 |----------|---------------|-------------|
-| **Host** | Empty directory | Docker mount point (in `.gitignore`) |
-| **Container** | 391+ packages | Actual dependencies in Docker volume |
+| **Host** | Empty directory | Podman mount point (in `.gitignore`) |
+| **Container** | 391+ packages | Actual dependencies in the Podman volume |
 
 ### Benefits
 
@@ -204,7 +204,7 @@ This devcontainer stores `node_modules` in a **Docker volume** that is isolated 
 
 ### How It Works
 
-The devcontainer mounts a Docker volume at `/workspace/app/node_modules`:
+The devcontainer mounts a Podman volume at `/workspace/app/node_modules`:
 
 ```json
 {
@@ -340,7 +340,7 @@ If you encounter persistent issues:
 cmd+shift+p → "Dev Containers: Rebuild and Reopen in Container"
 
 # Or from terminal
-docker buildx prune -f
+podman system prune -f
 ```
 
 ## Tips & Best Practices

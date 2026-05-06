@@ -1,14 +1,12 @@
 {
 	"docker.dockerPath": "/opt/podman/bin/podman",
-	"docker.host": "unix:///var/run/docker.sock",
 	"dev.containers.dockerPath": "/opt/podman/bin/podman",
-	"dev.containers.dockerSocketPath": "/var/run/docker.sock",
 	"containers.containerCommand": "/opt/podman/bin/podman",
 	"npm.packageManager": "bun",
-	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.tsdk": "app/node_modules/typescript/lib",
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "biomejs.biome",
-	"biome.lspBin": "${workspaceFolder}/node_modules/.bin/biome",
+	"biome.lspBin": "${workspaceFolder}/app/node_modules/.bin/biome",
 	"editor.codeActionsOnSave": {
 		"source.organizeImports.biome": "explicit",
 		"source.fixAll.biome": "explicit"
