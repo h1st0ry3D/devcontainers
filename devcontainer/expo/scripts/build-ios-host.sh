@@ -8,6 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "$SCRIPT_DIR/../app" && pwd)"
 HOST_NODE_MODULES="$APP_DIR/node_modules"
 PODMAN_BIN="${PODMAN_BIN:-/opt/podman/bin/podman}"
+CONTAINER_USER="${CONTAINER_USER:-node}"
 TEMP_ROOT=""
 RESTORE_ORIGINAL_NODE_MODULES=0
 ORIGINAL_NODE_MODULES_BACKUP=""
@@ -85,7 +86,7 @@ fi
 
 if ! "$PODMAN_BIN" exec "$CONTAINER_ID" test -f "$CONTAINER_APP_DIR/node_modules/expo/package.json"; then
     echo "📦 Container dependencies are missing; installing them inside the running Podman devcontainer..."
-    "$PODMAN_BIN" exec -u vscode "$CONTAINER_ID" sh -lc "cd '$CONTAINER_APP_DIR' && bun install"
+    "$PODMAN_BIN" exec -u "$CONTAINER_USER" "$CONTAINER_ID" sh -lc "cd '$CONTAINER_APP_DIR' && bun install"
 fi
 
 TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/expo-ios-host.XXXXXX")"

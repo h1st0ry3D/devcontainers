@@ -10,10 +10,10 @@ This guide explains how to run your Android emulator on the host machine while t
 ├─────────────────────────────────────┤
 │ - Android Emulator (AVD)            │
 │ - adb server                        │
-│ - Metro Bundler (localhost:8081)    │
+│ - Forwarded Metro port              │
 └────────────────┬────────────────────┘
                  │ adb connect / TCP 5555
-                 │ Metro connects via host.docker.internal:8081
+                 │ Emulator reaches Metro via forwarded port 8081
 ┌────────────────▼────────────────────┐
 │   Podman Container (rootless)       │
 ├─────────────────────────────────────┤
@@ -161,7 +161,7 @@ echo "REACT_NATIVE_PACKAGER_HOSTNAME=$(ipconfig getifaddr en0)" > .devcontainer/
 **Solutions**:
 1. Increase adb timeout:
    ```bash
-   adb connect host.docker.internal:5555 timeout 10
+   adb connect host.docker.internal:5555
    ```
 
 2. Restart both adb and emulator:

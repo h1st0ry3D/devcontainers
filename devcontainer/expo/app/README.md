@@ -263,7 +263,7 @@ bun expo prebuild
 bun expo run:android
 
 # Build iOS on the macOS host after prebuild
-./scripts/build-ios-host.sh
+cd .. && ./scripts/build-ios-host.sh
 ```
 
 Or use VS Code tasks:
@@ -310,7 +310,7 @@ The container automatically sets these:
 The devcontainer intentionally uses the official TypeScript/Node image as the parent image:
 
 - Base: `mcr.microsoft.com/devcontainers/typescript-node:4.0.1-20-bookworm`
-- Added in `Dockerfile`: Java 17, Android SDK command-line tools, ADB/Fastboot, and Watchman
+- Added in `Dockerfile`: Java 17, Android SDK command-line tools, platform-tools, CMake 3.22.1, NDK 27, Watchman, and React Native DevTools Linux runtime libraries
 - Added as a Feature: Bun 1.2.4
 - Not added: custom NodeSource setup or global npm replacement, because Node/npm/TypeScript tooling comes from the base image
 

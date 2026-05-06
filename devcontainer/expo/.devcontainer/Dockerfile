@@ -17,8 +17,6 @@ RUN set -eux; \
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         openjdk-17-jdk \
-        android-tools-adb \
-        android-tools-fastboot \
         watchman \
         libatk-bridge2.0-0 \
         libatspi2.0-0 \
@@ -59,9 +57,11 @@ RUN set -eux; \
     echo "84831b9409646a918e30573bab4c9c91346d8abd" > /usr/lib/android-sdk/licenses/android-sdk-preview-license; \
     yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk --licenses > /tmp/android-sdk-licenses.log || true; \
     /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk \
+        "platform-tools" \
         "platforms;android-36" \
         "build-tools;35.0.0" \
         "build-tools;36.0.0" \
+        "cmake;3.22.1" \
         "ndk;27.1.12297006"; \
     yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk --licenses >> /tmp/android-sdk-licenses.log || true; \
     rm -rf /tmp/android-cmdline-tools /tmp/android-cmdline-tools.zip /tmp/android-sdk-licenses.log; \
