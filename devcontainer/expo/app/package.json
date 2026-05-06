@@ -13,7 +13,8 @@
 		"android": "expo run:android",
 		"ios": "expo run:ios",
 		"web": "expo start --web",
-		"lint": "expo lint",
+		"lint": "biome check .",
+		"format": "biome format --write .",
 		"prebuild:android": "expo prebuild --platform android",
 		"prebuild:ios": "expo prebuild --platform ios && echo '\\n Prebuild complete. Now run the following on your macOS host to install CocoaPods and open Xcode:' && echo '  ./scripts/build-ios-host.sh'"
 	},
@@ -45,6 +46,7 @@
 		"react-native-web": "0.21.0"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.4.14",
 		"@types/react": "19.2.2",
 		"typescript": "5.9.2"
 	},

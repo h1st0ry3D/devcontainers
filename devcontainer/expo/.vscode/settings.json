@@ -3,10 +3,9 @@
 	"dev.containers.dockerPath": "/opt/podman/bin/podman",
 	"containers.containerCommand": "/opt/podman/bin/podman",
 	"npm.packageManager": "bun",
-	"typescript.tsdk": "app/node_modules/typescript/lib",
+	"js/ts.tsdk.path": "app/node_modules/typescript/lib",
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "biomejs.biome",
-	"biome.lspBin": "${workspaceFolder}/app/node_modules/.bin/biome",
 	"editor.codeActionsOnSave": {
 		"source.organizeImports.biome": "explicit",
 		"source.fixAll.biome": "explicit"
