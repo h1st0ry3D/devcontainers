@@ -44,19 +44,13 @@ RUN set -eux; \
 
 # Install Android SDK command-line tools and the packages required by Expo Android builds.
 RUN set -eux; \
-    mkdir -p /usr/lib/android-sdk/cmdline-tools /usr/lib/android-sdk/licenses /root/.android; \
+    mkdir -p /usr/lib/android-sdk/cmdline-tools /root/.android; \
     touch /root/.android/repositories.cfg; \
     curl -fsSL "https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_CMDLINE_TOOLS_VERSION}_latest.zip" -o /tmp/android-cmdline-tools.zip; \
     unzip -q /tmp/android-cmdline-tools.zip -d /tmp/android-cmdline-tools; \
     mv /tmp/android-cmdline-tools/cmdline-tools /usr/lib/android-sdk/cmdline-tools/latest; \
-    { \
-        echo "8933bad161af4178b1185d1a37fbf41ea5269c55"; \
-        echo "d56f5187479451eabf01fb78af6dfcb131a6481e"; \
-        echo "24333f8a63b6825ea9c5514f83c2829b004d1fee"; \
-    } > /usr/lib/android-sdk/licenses/android-sdk-license; \
-    echo "84831b9409646a918e30573bab4c9c91346d8abd" > /usr/lib/android-sdk/licenses/android-sdk-preview-license; \
     yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk --licenses > /tmp/android-sdk-licenses.log || true; \
-    /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk \
+    yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk \
         "platform-tools" \
         "platforms;android-36" \
         "build-tools;35.0.0" \
