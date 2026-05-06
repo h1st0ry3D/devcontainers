@@ -1,3 +1,6 @@
 [post-switch]
 copy = "wt step copy-ignored"
-install = "[ -d node_modules ] || bun install"
+install = "bun install --frozen-lockfile"
+
+[step.copy-ignored]
+exclude = ["node_modules/", "ios/", "android/", ".expo/"]
