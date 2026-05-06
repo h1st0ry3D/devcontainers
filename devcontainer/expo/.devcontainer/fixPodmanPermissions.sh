@@ -109,12 +109,38 @@ repair_workspace_bind_mount() {
 		\) -prune -o \
 		! -writable \
 		-exec chown "$CURRENT_UID:$CURRENT_GID" {} + 2>/dev/null || true
-dock
+
 	if workspace_is_writable; then
 		echo "✓ Repaired workspace bind-mount ownership"
 	else
 		echo "⚠ $WORKSPACE_DIR is still not writable. Rebuild/reopen the devcontainer and verify Podman is using '--userns=keep-id'."
 	fi
+}
+
+repair_generated_android_dir() {
+	local generated_dir="$1"
+	local unwritable_path
+
+	[ -d "$generated_dir" ] || return
+	unwritable_path="$(find "$generated_dir" ! -writable -print -quit 2>/dev/null || true)"
+	if can_write_dir "$generated_dir" && [ -z "$unwritable_path" ]; then
+		echo "✓ $generated_dir is writable"
+		return
+	fi
+
+	require_sudo "$generated_dir" || return
+
+	echo "Repairing generated Android ownership for $generated_dir..."
+	if [ -n "$unwritable_path" ]; then
+		echo "First unwritable path: $unwritable_path"
+	fi
+	run_as_root chown -R "$CURRENT_UID:$CURRENT_GID" "$generated_dir"
+	can_write_dir "$generated_dir" && echo "✓ Repaired $generated_dir ownership"
+}
+
+repair_generated_android_dirs() {
+	repair_generated_android_dir "$APP_DIR/android/.gradle"
+	repair_generated_android_dir "$APP_DIR/android/build"
 }
 
 repair_node_modules_volume() {
@@ -135,4 +161,5 @@ repair_node_modules_volume() {
 
 repair_tmp
 repair_workspace_bind_mount
+repair_generated_android_dirs
 repair_node_modules_volume
