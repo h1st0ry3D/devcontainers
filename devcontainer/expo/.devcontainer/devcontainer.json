@@ -47,9 +47,6 @@
 			"extensions": ["biomejs.biome", "expo.vscode-expo-tools"],
 			"settings": {
 				"npm.packageManager": "bun",
-				"terminal.integrated.env.linux": {
-					"PATH": "${env:PATH}:/usr/local/bin"
-				},
 				"terminal.integrated.defaultProfile.linux": "bash",
 				"terminal.integrated.profiles.linux": {
 					"bash": {
