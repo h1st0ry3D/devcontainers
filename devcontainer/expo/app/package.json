@@ -16,7 +16,7 @@
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"prebuild:android": "expo prebuild --platform android",
-		"prebuild:ios": "expo prebuild --platform ios && echo '\\n Prebuild complete. Now run the following from the repository root on your macOS host to install CocoaPods and open Xcode:' && echo '  ./scripts/build-ios-host.sh'"
+		"prebuild:ios": "expo prebuild --platform ios && echo '\n Prebuild complete. Now run the following from the repository root on your macOS host to install CocoaPods and open Xcode:' && echo '  ./scripts/build-ios-host.sh' && echo '  Note: local pod install still needs Node.js on macOS because Expo autolinking invokes node from the Podfile.'"
 	},
 	"dependencies": {
 		"@react-navigation/bottom-tabs": "7.15.5",

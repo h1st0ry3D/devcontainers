@@ -263,13 +263,15 @@ bun expo prebuild
 bun expo run:android
 
 # Build iOS on the macOS host after prebuild
+# Requires Xcode, CocoaPods, and a Node.js runtime on macOS.
+# App dependencies still come from the container via a temporary node_modules copy.
 cd .. && ./scripts/build-ios-host.sh
 ```
 
 Or use VS Code tasks:
 - **"Prebuild (Generate Native Code)"**
 - **"Build Android (Dev Client - container)"**
-- **"Build iOS (Dev Client - macOS host)"**
+- **"Build iOS (Dev Client - macOS host)"** — avoids host-side package installs, but still needs host Node.js for Expo autolinking during `pod install`
 
 ## Package Management with Bun
 

@@ -105,7 +105,7 @@
 			"label": "Build iOS (Dev Client - macOS host)",
 			"type": "shell",
 			"command": "echo",
-			"args": ["To build the iOS dev client on macOS without installing npm packages on the host:\n1. Run 'Prebuild iOS (Generate Native Code)' in the container\n2. On your Mac host, run: ./scripts/build-ios-host.sh\n\nThe script copies node_modules out of the running Podman devcontainer, installs CocoaPods on the host, opens Xcode, and cleans up when Xcode closes."],
+			"args": ["To build the iOS dev client on macOS without installing npm packages on the host:\n1. Run 'Prebuild iOS (Generate Native Code)' in the container\n2. On your Mac host, run: ./scripts/build-ios-host.sh\n\nThe script copies node_modules out of the running Podman devcontainer, runs CocoaPods on the host, opens Xcode, and cleans up when Xcode closes. Note: Expo's generated Podfile still invokes 'node' during pod install, so the host needs Xcode, CocoaPods, and a Node.js runtime."],
 			"group": "build",
 			"presentation": {
 				"echo": true,

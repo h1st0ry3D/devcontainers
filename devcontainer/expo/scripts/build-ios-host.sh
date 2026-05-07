@@ -61,6 +61,15 @@ if ! command -v pod >/dev/null 2>&1; then
     exit 1
 fi
 
+if ! command -v node >/dev/null 2>&1; then
+    echo "❌ Error: Node.js not found on the macOS host."
+    echo "   Expo's generated Podfile shells out to 'node' during pod install for autolinking."
+    echo "   This script keeps app dependencies in the container and only copies node_modules temporarily,"
+    echo "   but local iOS pod installation still needs a host Node.js runtime."
+    echo "   If you want zero host-side Node.js, use a cloud iOS build instead of local pod install."
+    exit 1
+fi
+
 if [ ! -d "$APP_DIR/ios" ]; then
     echo "❌ Error: ios/ directory not found."
     echo "   Run this first in the container: cd app && bun run prebuild:ios"
