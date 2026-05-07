@@ -1,4 +1,5 @@
 #!/bin/bash
+# Re-applies Podman-related permission fixes whenever the devcontainer starts.
 set -euo pipefail
 
 APP_DIR="/workspace/app"

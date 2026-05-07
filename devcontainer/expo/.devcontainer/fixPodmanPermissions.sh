@@ -1,4 +1,5 @@
 #!/bin/bash
+# Fixes Podman bind-mount, generated Android, and node_modules ownership issues.
 set -euo pipefail
 
 WORKSPACE_DIR="/workspace"

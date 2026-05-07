@@ -1,4 +1,5 @@
 #!/bin/bash
+# Generates .devcontainer/.env with the host IP for Metro/Expo networking.
 set -euo pipefail
 
 ENV_FILE=".devcontainer/.env"

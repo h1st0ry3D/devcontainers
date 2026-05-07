@@ -1,4 +1,5 @@
 #!/bin/bash
+# Repairs Podman mount permissions and installs app dependencies after container creation.
 set -euo pipefail
 
 APP_DIR="/workspace/app"

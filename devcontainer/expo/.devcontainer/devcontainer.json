@@ -9,22 +9,10 @@
 			"version": "1.2.4"
 		}
 	},
-	"forwardPorts": [8081, 19000, 19001, 19002, 19006],
+	"forwardPorts": [8081, 19006],
 	"portsAttributes": {
 		"8081": {
 			"label": "Metro Bundler",
-			"visibility": "public"
-		},
-		"19000": {
-			"label": "Expo Dev Tools",
-			"visibility": "public"
-		},
-		"19001": {
-			"label": "React Native Debugger",
-			"visibility": "public"
-		},
-		"19002": {
-			"label": "Expo Dev Client",
 			"visibility": "public"
 		},
 		"19006": {
@@ -71,8 +59,5 @@
 		}
 	],
 	"remoteUser": "node",
-	"updateRemoteUserUID": true,
-	"containerEnv": {
-		"CHOKIDAR_USEPOLLING": "true"
-	}
+	"updateRemoteUserUID": true
 }
