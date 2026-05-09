@@ -1,6 +1,6 @@
 # Agent Dev Container
 
-Dev container with Homebrew, opencode (AI agent), and dotfiles from hstorz/dotfiles.
+Dev container with Homebrew, opencode (AI agent), pi (AI agent), and dotfiles from hstorz/dotfiles.
 
 ## How It Works
 
@@ -17,9 +17,10 @@ Dev container with Homebrew, opencode (AI agent), and dotfiles from hstorz/dotfi
 
 ## Usage
 
-### AI Agent (opencode)
+### AI Agents
 ```bash
-opencode
+opencode  # OpenCode AI agent
+pi        # Pi AI agent
 ```
 
 ### Terminal
@@ -32,6 +33,7 @@ zsh
 | Tool | Description |
 |------|-------------|
 | `opencode` | AI coding assistant |
+| `pi` | AI coding agent |
 | `lazygit` | TUI git client |
 | `fzf` | Fuzzy finder |
 | `tmux` | Terminal multiplexer |
