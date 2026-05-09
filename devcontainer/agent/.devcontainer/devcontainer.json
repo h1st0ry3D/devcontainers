@@ -5,8 +5,9 @@
     "context": "."
   },
   "forwardPorts": [],
-  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh && sudo chown -R $(id -u):$(id -g) .",
   "remoteUser": "linuxbrew",
+  "containerUser": "root",
   "customizations": {
     "vscode": {
       "extensions": [

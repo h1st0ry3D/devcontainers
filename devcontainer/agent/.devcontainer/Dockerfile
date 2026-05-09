@@ -11,11 +11,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     wget \
     zsh \
+    sudo \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -m -s /bin/zsh linuxbrew
 
 WORKDIR /home/linuxbrew
 RUN chown -R linuxbrew:linuxbrew /home/linuxbrew
+RUN echo "linuxbrew ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER linuxbrew
 
