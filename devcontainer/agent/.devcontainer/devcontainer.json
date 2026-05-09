@@ -10,7 +10,8 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "anomalyco.opencode"
+        "anomalyco.opencode",
+        "cdervis.vscode-pi"
       ]
     }
   }

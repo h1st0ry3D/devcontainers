@@ -23,6 +23,10 @@ RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.co
 
 ENV PATH="/home/linuxbrew/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
 
-RUN curl -fsSL https://raw.githubusercontent.com/hstorz/dotfiles/main/Brewfile | tail -n +2 > /tmp/Brewfile && brew bundle install --file=/tmp/Brewfile && rm /tmp/Brewfile
+RUN curl -fsSL https://raw.githubusercontent.com/hstorz/dotfiles/main/Brewfile | tail -n +2 > /tmp/Brewfile && \
+    echo "brew \"node\"" >> /tmp/Brewfile && \
+    brew bundle install --file=/tmp/Brewfile && \
+    rm /tmp/Brewfile && \
+    npm install -g @earendil-works/pi-coding-agent
 
 CMD ["zsh"]
