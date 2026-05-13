@@ -7,6 +7,10 @@
 	"features": {
 		"ghcr.io/devcontainers-extra/features/bun:1": {
 			"version": "1.2.4"
+		},
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.12",
+			"installTools": false
 		}
 	},
 	"forwardPorts": [8081, 19006],
@@ -32,7 +36,12 @@
 	"initializeCommand": "bash .devcontainer/initializeCommand.sh",
 	"customizations": {
 		"vscode": {
-			"extensions": ["biomejs.biome", "expo.vscode-expo-tools"],
+			"extensions": [
+				"biomejs.biome",
+				"expo.vscode-expo-tools",
+				"ms-python.python",
+				"ms-python.vscode-pylance"
+			],
 			"settings": {
 				"npm.packageManager": "bun",
 				"terminal.integrated.defaultProfile.linux": "bash",
