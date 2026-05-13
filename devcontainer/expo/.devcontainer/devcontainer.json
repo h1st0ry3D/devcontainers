@@ -16,6 +16,7 @@
 	},
 	"forwardPorts": [8081, 19006],
 	"containerEnv": {
+		"GRADLE_USER_HOME": "/workspace/.gradle",
 		"PIP_DISABLE_PIP_VERSION_CHECK": "1",
 		"PIP_NO_CACHE_DIR": "1",
 		"PIP_REQUIRE_VIRTUALENV": "true"
@@ -70,6 +71,11 @@
 		{
 			"source": "expo-node_modules",
 			"target": "/workspace/app/node_modules",
+			"type": "volume"
+		},
+		{
+			"source": "expo-gradle-cache",
+			"target": "/workspace/.gradle",
 			"type": "volume"
 		}
 	],

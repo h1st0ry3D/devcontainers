@@ -11,6 +11,16 @@
 
 If you use Podman, the devcontainer now starts with `--userns=keep-id` so the container user can write to the bind-mounted workspace reliably.
 
+## 🔐 Devcontainer Defaults
+
+The Expo devcontainer now includes a few opinionated defaults for safer and faster day-to-day development:
+
+- **Runs as `node` by default** and not as root for normal development tasks.
+- **Limited sudo access** is available only for the scoped Podman permission-repair helper used to fix writable mounts and volumes.
+- **Bun installs use a 3-day minimum release age** via `~/.bunfig.toml` to reduce exposure to very new package releases.
+- **Python installs require a virtual environment** by default (`PIP_REQUIRE_VIRTUALENV=true`).
+- **Gradle artifacts are cached in a dedicated Podman volume** mounted at `/workspace/.gradle` for faster Android rebuilds.
+
 ## 📁 Project Structure
 
 ```

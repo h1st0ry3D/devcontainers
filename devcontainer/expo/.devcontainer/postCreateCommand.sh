@@ -36,6 +36,7 @@ bash /workspace/.devcontainer/fixPodmanPermissions.sh "$APP_DIR"
 configure_bun_defaults
 echo "Configured Bun minimum release age to 3 days in $HOME/.bunfig.toml"
 echo "Python package installs require a virtual environment by default."
+echo "Gradle dependencies are cached in ${GRADLE_USER_HOME:-/workspace/.gradle}."
 echo "Use bun install/bun add for JavaScript dependencies to avoid npm lifecycle scripts."
 
 if [ -f "$APP_DIR/package.json" ]; then
