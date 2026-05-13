@@ -1,5 +1,6 @@
 {
 	"name": "Expo (React Native)",
+	"init": true,
 	"build": {
 		"dockerfile": "Dockerfile",
 		"context": ".."
@@ -14,6 +15,11 @@
 		}
 	},
 	"forwardPorts": [8081, 19006],
+	"containerEnv": {
+		"PIP_DISABLE_PIP_VERSION_CHECK": "1",
+		"PIP_NO_CACHE_DIR": "1",
+		"PIP_REQUIRE_VIRTUALENV": "true"
+	},
 	"portsAttributes": {
 		"8081": {
 			"label": "Metro Bundler",
@@ -34,7 +40,7 @@
 	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
 	"postStartCommand": "bash .devcontainer/postStartCommand.sh",
 	"initializeCommand": "bash .devcontainer/initializeCommand.sh",
-	"customizations": {
+	"customizations": { 
 		"vscode": {
 			"extensions": [
 				"biomejs.biome",

@@ -10,18 +10,7 @@ fi
 
 CURRENT_UID="$(id -u)"
 CURRENT_GID="$(id -g)"
-SUDO=""
-if sudo -n true 2>/dev/null; then
-	SUDO="sudo -n"
-fi
-
-run_as_root() {
-	if [ -n "$SUDO" ]; then
-		$SUDO "$@"
-	else
-		"$@"
-	fi
-}
+ROOT_HELPER="/usr/local/bin/expo-devcontainer-root-helper"
 
 can_write_dir() {
 	local dir="$1"
@@ -39,7 +28,7 @@ can_write_file() {
 }
 
 require_sudo() {
-	if [ -n "$SUDO" ]; then
+	if [ "$EUID" -eq 0 ] || sudo -n true 2>/dev/null; then
 		return 0
 	fi
 
@@ -48,8 +37,17 @@ require_sudo() {
 	return 1
 }
 
+run_root_helper() {
+	if [ "$EUID" -eq 0 ]; then
+		"$ROOT_HELPER" "$@"
+		return
+	fi
+
+	sudo -n "$ROOT_HELPER" "$@"
+}
+
 repair_tmp() {
-	run_as_root chmod 1777 /tmp 2>/dev/null || true
+	run_root_helper repair-tmp 2>/dev/null || true
 }
 
 workspace_is_writable() {
@@ -94,22 +92,7 @@ repair_workspace_bind_mount() {
 	if [ -n "$unwritable_path" ]; then
 		echo "First unwritable path: $unwritable_path"
 	fi
-	run_as_root find "$WORKSPACE_DIR" \
-		\( \
-			-name ".DS_Store" -o \
-			-path "$APP_DIR/node_modules" -o \
-			-path "$APP_DIR/node_modules/*" -o \
-			-path "$APP_DIR/ios/Pods" -o \
-			-path "$APP_DIR/ios/Pods/*" -o \
-			-path "$APP_DIR/ios/build" -o \
-			-path "$APP_DIR/ios/build/*" -o \
-			-path "$APP_DIR/android/build" -o \
-			-path "$APP_DIR/android/build/*" -o \
-			-path "$APP_DIR/android/.gradle" -o \
-			-path "$APP_DIR/android/.gradle/*" \
-		\) -prune -o \
-		! -writable \
-		-exec chown "$CURRENT_UID:$CURRENT_GID" {} + 2>/dev/null || true
+	run_root_helper repair-workspace "$WORKSPACE_DIR" "$APP_DIR" "$CURRENT_UID" "$CURRENT_GID" 2>/dev/null || true
 
 	if workspace_is_writable; then
 		echo "✓ Repaired workspace bind-mount ownership"
@@ -135,7 +118,7 @@ repair_generated_android_dir() {
 	if [ -n "$unwritable_path" ]; then
 		echo "First unwritable path: $unwritable_path"
 	fi
-	run_as_root chown -R "$CURRENT_UID:$CURRENT_GID" "$generated_dir"
+	run_root_helper repair-dir "$generated_dir" "$CURRENT_UID" "$CURRENT_GID"
 	can_write_dir "$generated_dir" && echo "✓ Repaired $generated_dir ownership"
 }
 
@@ -156,7 +139,7 @@ repair_node_modules_volume() {
 	require_sudo "$node_modules_dir" || return
 
 	echo "Repairing node_modules volume ownership..."
-	run_as_root chown -R "$CURRENT_UID:$CURRENT_GID" "$node_modules_dir"
+	run_root_helper repair-dir "$node_modules_dir" "$CURRENT_UID" "$CURRENT_GID"
 	can_write_dir "$node_modules_dir" && echo "✓ Repaired node_modules volume ownership"
 }
 

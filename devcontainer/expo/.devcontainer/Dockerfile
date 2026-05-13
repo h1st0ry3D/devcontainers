@@ -44,9 +44,12 @@ RUN set -eux; \
 
 # Install Android SDK command-line tools and the packages required by Expo Android builds.
 RUN set -eux; \
-    mkdir -p /usr/lib/android-sdk/cmdline-tools /root/.android; \
+    mkdir -p /usr/lib/android-sdk/cmdline-tools /root/.android /home/node/.android; \
     touch /root/.android/repositories.cfg; \
-    curl -fsSL "https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_CMDLINE_TOOLS_VERSION}_latest.zip" -o /tmp/android-cmdline-tools.zip; \
+    touch /home/node/.android/repositories.cfg; \
+    curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 \
+        "https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_CMDLINE_TOOLS_VERSION}_latest.zip" \
+        -o /tmp/android-cmdline-tools.zip; \
     unzip -q /tmp/android-cmdline-tools.zip -d /tmp/android-cmdline-tools; \
     mv /tmp/android-cmdline-tools/cmdline-tools /usr/lib/android-sdk/cmdline-tools/latest; \
     yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk --licenses > /tmp/android-sdk-licenses.log || true; \
@@ -59,12 +62,13 @@ RUN set -eux; \
         "ndk;27.1.12297006"; \
     yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk --licenses >> /tmp/android-sdk-licenses.log || true; \
     rm -rf /tmp/android-cmdline-tools /tmp/android-cmdline-tools.zip /tmp/android-sdk-licenses.log; \
-    chown -R node:node /usr/lib/android-sdk
+    chown -R node:node /usr/lib/android-sdk /home/node/.android
 
 # Set up environment
 ENV PATH="/usr/local/bin:${PATH}" \
     ANDROID_HOME=/usr/lib/android-sdk \
     ANDROID_SDK_ROOT=/usr/lib/android-sdk \
+    ANDROID_USER_HOME=/home/node/.android \
     REACT_NATIVE_DEBUGGER_DISABLED=true \
     NODE_OPTIONS=--max-old-space-size=4096
 
@@ -72,9 +76,11 @@ ENV PATH="${PATH}:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/l
 
 WORKDIR /workspace
 
-# Allow node user to use sudo without password (for rootless Podman permission fixes)
-RUN echo "node ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/node-nopasswd && \
-    chmod 440 /etc/sudoers.d/node-nopasswd
+# Allow node user to run only the hardened Podman permission repair helper.
+COPY .devcontainer/expo-devcontainer-root-helper.sh /usr/local/bin/expo-devcontainer-root-helper
+RUN chmod 755 /usr/local/bin/expo-devcontainer-root-helper && \
+    printf 'node ALL=(root) NOPASSWD: /usr/local/bin/expo-devcontainer-root-helper *\n' > /etc/sudoers.d/node-expo-devcontainer && \
+    chmod 440 /etc/sudoers.d/node-expo-devcontainer
 
 # Verify build-time toolchain. Bun is installed later via a devcontainer Feature.
 RUN node --version && npm --version && java -version && sdkmanager --version && adb version
