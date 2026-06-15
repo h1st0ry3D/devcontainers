@@ -4,32 +4,20 @@ Dev container with Homebrew, opencode (AI agent), pi (AI agent), and dotfiles fr
 
 ## How It Works
 
-1. **Base Image** - Ubuntu Noble
-2. **Install Homebrew** - Official install script (Linuxbrew)
-3. **Install packages from Brewfile** - At build time from github.com/hstorz/dotfiles/Brewfile
-4. **Apply chezmoi dotfiles** - On container start (postCreateCommand)
-
-### UID Matching
-
-The container user (`linuxbrew`) uses UID 1000 to match your host user. This prevents file ownership issues on bind-mounted files.
+1. **Base Image** - `mcr.microsoft.com/devcontainers/base:bookworm` (Debian 12 with `vscode` user at UID 1000)
+2. **Homebrew** - Official install script, all tools installed via `brew bundle` at build time
+3. **Dotfiles** - Applied via chezmoi on container start
 
 ## Quick Start
 
-1. Open project in VS Code
-2. `Ctrl+Shift+P` → **"Dev Containers: Reopen in Container"**
-3. Wait for container to build
+Open in VS Code → `Ctrl+Shift+P` → **"Dev Containers: Reopen in Container"**
 
 ## Usage
 
-### AI Agents
 ```bash
 opencode  # OpenCode AI agent
 pi        # Pi AI agent
-```
-
-### Terminal
-```bash
-zsh
+zsh       # Default shell
 ```
 
 ## Installed Tools
@@ -38,25 +26,13 @@ zsh
 |------|-------------|
 | `opencode` | AI coding assistant |
 | `pi` | AI coding agent |
+| `chezmoi` | Dotfiles manager |
 | `lazygit` | TUI git client |
 | `fzf` | Fuzzy finder |
 | `tmux` | Terminal multiplexer |
 | `starship` | Prompt |
 | `biome` | JS/TS formatter/linter |
-| `chezmoi` | Dotfiles manager |
 | `delta` | Git pager |
-
-## Zsh Plugins
-
-- zsh-autosuggestions
-- zsh-syntax-highlighting
-
-## Dotfiles
-
-Applied via chezmoi from github.com/hstorz/dotfiles:
-- `.zshrc` - Zsh configuration
-- `.zprofile` - Login profile
-- `.tmux.conf` - Tmux settings
 
 ## Files
 
@@ -72,17 +48,13 @@ agent/
 
 ## Troubleshooting
 
-### Homebrew not found
 ```bash
+# Homebrew not found
 export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-```
 
-### chezmoi dotfiles not applied
-```bash
+# Re-run dotfiles
 chezmoi apply
-```
 
-### Re-run brew bundle
-```bash
+# Re-install Brewfile packages
 brew bundle install
 ```

@@ -8,7 +8,7 @@
   "runArgs": ["--name", "agent"],
   "forwardPorts": [],
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
-  "remoteUser": "linuxbrew",
+  "remoteUser": "vscode",
   "customizations": {
     "vscode": {
       "extensions": [
