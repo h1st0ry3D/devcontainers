@@ -1,9 +1,14 @@
 {
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
   "name": "Agent Dev Container",
   "build": {
     "dockerfile": "Dockerfile",
     "context": "."
   },
+  "features": {
+    "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {}
+  },
+  "runArgs": ["--name", "agent"],
   "forwardPorts": [],
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh && sudo chown -R $(id -u):$(id -g) .",
   "remoteUser": "linuxbrew",

@@ -1,18 +1,25 @@
 #!/bin/bash
 set -e
 
-export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+export HOMEBREW_NONINTERACTIVE=1
+export HOMEBREW_NO_AUTO_UPDATE=1
 
 echo "=========================================="
-echo "  Brew Dev Container - Post Setup          "
+echo "  Agent Dev Container - Post Setup         "
 echo "=========================================="
+
+echo "Fixing Homebrew permissions..."
+sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew
 
 echo "Installing chezmoi..."
-sudo -u linuxbrew HOME=/home/linuxbrew HOMEBREW_CACHE=/home/linuxbrew/.cache/Homebrew /home/linuxbrew/.linuxbrew/bin/brew install chezmoi
+yes | brew install chezmoi
 
 echo "Applying dotfiles from chezmoi..."
-sudo -u linuxbrew HOME=/home/linuxbrew chezmoi init https://github.com/hstorz/dotfiles.git --no-tty || true
-sudo -u linuxbrew HOME=/home/linuxbrew chezmoi apply --destination=/home/linuxbrew --no-tty || true
+chezmoi init https://github.com/hstorz/dotfiles.git --no-tty || true
+chezmoi apply --destination=$HOME --no-tty || true
+
+echo "Installing packages from Brewfile..."
+yes | brew bundle --file=$HOME/Brewfile || true
 
 echo "=========================================="
 echo "  Dev container ready!                    "
