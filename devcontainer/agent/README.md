@@ -6,8 +6,12 @@ Dev container with Homebrew, opencode (AI agent), pi (AI agent), and dotfiles fr
 
 1. **Base Image** - Ubuntu Noble
 2. **Install Homebrew** - Official install script (Linuxbrew)
-3. **Run brew bundle** - At build time from github.com/hstorz/dotfiles/Brewfile
-4. **Apply chezmoi** - On container start (postCreateCommand)
+3. **Install packages from Brewfile** - At build time from github.com/hstorz/dotfiles/Brewfile
+4. **Apply chezmoi dotfiles** - On container start (postCreateCommand)
+
+### UID Matching
+
+The container user (`linuxbrew`) uses UID 1000 to match your host user. This prevents file ownership issues on bind-mounted files.
 
 ## Quick Start
 
@@ -57,12 +61,13 @@ Applied via chezmoi from github.com/hstorz/dotfiles:
 ## Files
 
 ```
-brew/
-└── .devcontainer/
-    ├── devcontainer.json
-    ├── Dockerfile
-    ├── postCreateCommand.sh
-    └── README.md
+agent/
+├── .devcontainer/
+│   ├── devcontainer.json
+│   ├── Dockerfile
+│   └── postCreateCommand.sh
+├── .dockerignore
+└── README.md
 ```
 
 ## Troubleshooting
@@ -77,7 +82,7 @@ export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 chezmoi apply
 ```
 
-### Re-run bundle install
+### Re-run brew bundle
 ```bash
 brew bundle install
 ```
