@@ -1,0 +1,40 @@
+{
+    "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+    "name": "Python",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "init": true,
+    "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace",
+    "workspaceFolder": "/workspace",
+    "remoteUser": "vscode",
+    "runArgs": [
+        "--name=python",
+        "--userns=keep-id:uid=1000,gid=1000",
+        "--security-opt=no-new-privileges:true",
+        "--cap-drop=NET_ADMIN",
+        "--cap-drop=SYS_ADMIN",
+        "--cap-drop=SYS_PTRACE",
+        "--cap-drop=SYS_MODULE",
+        "--cap-drop=DAC_READ_SEARCH",
+        "--cap-drop=AUDIT_WRITE",
+        "--tmpfs=/tmp:rw,nosuid,nodev,exec,mode=1777"
+    ],
+    "mounts": [
+        "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly",
+        "source=python-vscode-server-${devcontainerId},target=/home/vscode/.vscode-server,type=volume"
+    ],
+    "postCreateCommand": "if [ -f requirements.txt ]; then pip install -r requirements.txt; fi",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    }
+}
