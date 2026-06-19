@@ -3,6 +3,10 @@
 # dependencies
 node_modules/
 
+# build / cache (kept on host, git-ignored)
+.gradle/
+.cache/
+
 # Expo
 .expo/
 dist/

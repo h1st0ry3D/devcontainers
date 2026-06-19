@@ -12,14 +12,14 @@
     },
     "forwardPorts": [8081, 19006],
     "containerEnv": {
-        "ANDROID_HOME": "/root/.local/share/mise/installs/android-sdk/20.0",
-        "ANDROID_SDK_ROOT": "/root/.local/share/mise/installs/android-sdk/20.0",
-        "ANDROID_USER_HOME": "/root/.android",
+        "ANDROID_HOME": "/home/node/.local/share/mise/installs/android-sdk/20.0",
+        "ANDROID_SDK_ROOT": "/home/node/.local/share/mise/installs/android-sdk/20.0",
+        "ANDROID_USER_HOME": "/home/node/.android",
         "REACT_NATIVE_PACKAGER_HOSTNAME": "localhost",
         "GRADLE_USER_HOME": "/workspace/.gradle",
-        "MISE_CACHE_DIR": "/root/.cache/mise",
-        "MISE_DATA_DIR": "/root/.local/share/mise",
-        "MISE_STATE_DIR": "/root/.local/state/mise",
+        "MISE_CACHE_DIR": "/home/node/.cache/mise",
+        "MISE_DATA_DIR": "/home/node/.local/share/mise",
+        "MISE_STATE_DIR": "/home/node/.local/state/mise",
         "MISE_TRUSTED_CONFIG_PATHS": "/workspace",
         "NODE_EXTRA_CA_CERTS": "/workspace/secrets/certs/ca.crt",
         "PIP_DISABLE_PIP_VERSION_CHECK": "1",
@@ -27,7 +27,7 @@
         "PIP_REQUIRE_VIRTUALENV": "true"
     },
     "remoteEnv": {
-        "PATH": "${containerEnv:PATH}:/root/.local/share/mise/shims:${containerEnv:ANDROID_HOME}/cmdline-tools/20.0/bin:${containerEnv:ANDROID_HOME}/platform-tools"
+        "PATH": "${containerEnv:PATH}:/home/node/.local/share/mise/shims:${containerEnv:ANDROID_HOME}/cmdline-tools/20.0/bin:${containerEnv:ANDROID_HOME}/platform-tools"
     },
     "portsAttributes": {
         "8081": {
@@ -41,8 +41,15 @@
     },
     "runArgs": [
         "--name=expo",
+        "--userns=keep-id:uid=1000,gid=1000",
+        "--security-opt=no-new-privileges:true",
+        "--cap-drop=NET_ADMIN",
+        "--cap-drop=SYS_ADMIN",
+        "--cap-drop=SYS_PTRACE",
+        "--cap-drop=SYS_MODULE",
+        "--cap-drop=DAC_READ_SEARCH",
+        "--cap-drop=AUDIT_WRITE",
         "--tmpfs=/tmp:rw,exec,nosuid,nodev,mode=1777",
-        "--userns=keep-id",
         "--add-host=host.docker.internal:host-gateway"
     ],
     "initializeCommand": [
@@ -78,37 +85,28 @@
             "target": "/workspace",
             "type": "bind"
         },
-        {
-            "source": "${localWorkspaceFolderBasename}-node_modules",
-            "target": "/workspace/app/node_modules",
-            "type": "volume"
-        },
+        "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly",
         {
             "source": "${localWorkspaceFolderBasename}-mise-data",
-            "target": "/root/.local/share/mise",
+            "target": "/home/node/.local/share/mise",
             "type": "volume"
         },
         {
             "source": "${localWorkspaceFolderBasename}-mise-cache",
-            "target": "/root/.cache/mise",
+            "target": "/home/node/.cache/mise",
             "type": "volume"
         },
         {
             "source": "${localWorkspaceFolderBasename}-mise-state",
-            "target": "/root/.local/state/mise",
+            "target": "/home/node/.local/state/mise",
             "type": "volume"
         },
         {
-            "source": "${localWorkspaceFolderBasename}-gradle-cache",
-            "target": "/workspace/.gradle",
-            "type": "volume"
-        },
-        {
-            "source": "${localWorkspaceFolderBasename}-workspace-cache",
-            "target": "/workspace/.cache",
+            "source": "expo-vscode-server-${devcontainerId}",
+            "target": "/home/node/.vscode-server",
             "type": "volume"
         }
     ],
-    "remoteUser": "root",
+    "remoteUser": "node",
     "updateRemoteUserUID": false
 }
