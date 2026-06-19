@@ -1,14 +1,15 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-echo "=========================================="
-echo "  Agent Dev Container - Post Setup         "
-echo "=========================================="
+# Dotfiles are applied from a PINNED commit of h1st0ry3D/dotfiles.
+# Bump DOTFILES_COMMIT to update to the latest dotfiles.
 
-echo "Applying dotfiles from chezmoi..."
-chezmoi init https://github.com/h1st0ry3D/dotfiles.git --no-tty || true
-chezmoi apply --destination=$HOME --no-tty || true
+DOTFILES_REPO="https://github.com/h1st0ry3D/dotfiles.git"
+DOTFILES_COMMIT="10524ba"
 
-echo "=========================================="
-echo "  Dev container ready!                    "
-echo "=========================================="
+echo "==> Applying dotfiles from chezmoi @ ${DOTFILES_COMMIT}..."
+chezmoi init "${DOTFILES_REPO}" --no-tty
+git -C "$(chezmoi source-path)" -c advice.detachedHead=false checkout "${DOTFILES_COMMIT}"
+chezmoi apply --destination="${HOME}" --no-tty
+
+echo "==> Dev container ready."

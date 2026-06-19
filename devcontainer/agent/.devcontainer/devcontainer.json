@@ -3,18 +3,49 @@
   "name": "Agent Dev Container",
   "build": {
     "dockerfile": "Dockerfile",
-    "context": "."
+    "context": ".."
   },
-  "runArgs": ["--name", "agent"],
-  "forwardPorts": [],
-  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+  "init": true,
+  "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace",
+  "workspaceFolder": "/workspace",
   "remoteUser": "vscode",
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+  "runArgs": [
+    "--userns=keep-id:uid=1000,gid=1000",
+    "--security-opt=no-new-privileges:true",
+    "--cap-drop=NET_ADMIN",
+    "--cap-drop=SYS_ADMIN",
+    "--cap-drop=SYS_PTRACE",
+    "--cap-drop=SYS_MODULE",
+    "--cap-drop=DAC_READ_SEARCH",
+    "--cap-drop=AUDIT_WRITE",
+    "--tmpfs=/tmp:rw,nosuid,nodev,exec,mode=1777"
+  ],
+  "remoteEnv": {
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
+    "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}",
+    "OPENAI_API_KEY": "${localEnv:OPENAI_API_KEY}",
+    "OPENROUTER_API_KEY": "${localEnv:OPENROUTER_API_KEY}"
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly",
+    "source=agent-vscode-server-${devcontainerId},target=/home/vscode/.vscode-server,type=volume"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
         "anomalyco.opencode",
         "cdervis.vscode-pi"
-      ]
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh",
+            "args": ["-l"]
+          }
+        }
+      }
     }
   }
 }
