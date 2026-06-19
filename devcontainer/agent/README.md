@@ -39,6 +39,24 @@ export OPENROUTER_API_KEY=...
 Only `remoteEnv` is used (never `containerEnv`/`ENV`) so secrets do not end up
 in inspectable image metadata and are only present for attached processes.
 
+## Agent config and state (kept inside the container)
+
+`pi` and `opencode` configuration is **not** bind-mounted from the host.
+Instead, `postCreateCommand` runs `chezmoi apply` from the pinned dotfiles
+commit, which provisions the shared config into the container:
+
+- `~/.config/opencode/opencode.json`
+- `~/.pi/agent/settings.json`, `models.json`, `keybindings.json`, `extensions/`
+
+Agent **state** (sessions, npm plugin installs) lives entirely inside the
+container's writable home and is ephemeral — it does not survive a rebuild and
+is not coupled to the host. This keeps the host ↔ container boundary clean and
+avoids exposing host credentials.
+
+**Secrets are never on disk in the container:** `~/.pi/agent/auth.json` is not
+provisioned by chezmoi and not mounted, so API keys come only from `remoteEnv`
+(see above). Re-authenticate in the container if a tool needs a persisted token.
+
 ## Security hardening
 
 - **No passwordless sudo** — the base image's NOPASSWD `vscode` sudoers entry is
