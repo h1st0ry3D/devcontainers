@@ -1,84 +1,114 @@
 {
-	"name": "Expo (React Native)",
-	"init": true,
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": ".."
-	},
-	"features": {
-		"ghcr.io/devcontainers-extra/features/bun:1": {
-			"version": "1.2.4"
-		},
-		"ghcr.io/devcontainers/features/python:1": {
-			"version": "3.12",
-			"installTools": false
-		}
-	},
-	"forwardPorts": [8081, 19006],
-	"containerEnv": {
-		"GRADLE_USER_HOME": "/workspace/.gradle",
-		"PIP_DISABLE_PIP_VERSION_CHECK": "1",
-		"PIP_NO_CACHE_DIR": "1",
-		"PIP_REQUIRE_VIRTUALENV": "true"
-	},
-	"portsAttributes": {
-		"8081": {
-			"label": "Metro Bundler",
-			"visibility": "public"
-		},
-		"19006": {
-			"label": "Expo Web",
-			"visibility": "public"
-		}
-	},
-	"runArgs": [
-		"--tmpfs=/tmp:rw,exec,nosuid,nodev,mode=1777",
-		"--userns=keep-id",
-		"--add-host=host.docker.internal:host-gateway",
-		"--env-file",
-		".devcontainer/.env"
-	],
-	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
-	"postStartCommand": "bash .devcontainer/postStartCommand.sh",
-	"initializeCommand": "bash .devcontainer/initializeCommand.sh",
-	"customizations": { 
-		"vscode": {
-			"extensions": [
-				"biomejs.biome",
-				"expo.vscode-expo-tools",
-				"ms-python.python",
-				"ms-python.vscode-pylance"
-			],
-			"settings": {
-				"npm.packageManager": "bun",
-				"terminal.integrated.defaultProfile.linux": "bash",
-				"terminal.integrated.profiles.linux": {
-					"bash": {
-						"path": "/bin/bash",
-						"args": ["-l"]
-					}
-				}
-			}
-		}
-	},
-	"workspaceFolder": "/workspace",
-	"mounts": [
-		{
-			"source": "${localWorkspaceFolder}",
-			"target": "/workspace",
-			"type": "bind"
-		},
-		{
-			"source": "expo-node_modules",
-			"target": "/workspace/app/node_modules",
-			"type": "volume"
-		},
-		{
-			"source": "expo-gradle-cache",
-			"target": "/workspace/.gradle",
-			"type": "volume"
-		}
-	],
-	"remoteUser": "node",
-	"updateRemoteUserUID": true
+    "name": "Expo (React Native)",
+    "init": true,
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "features": {
+        "ghcr.io/roul/devcontainer-features/mise:1": {
+            "version": "2026.5.6"
+        }
+    },
+    "forwardPorts": [8081, 19006],
+    "containerEnv": {
+        "ANDROID_HOME": "/root/.local/share/mise/installs/android-sdk/20.0",
+        "ANDROID_SDK_ROOT": "/root/.local/share/mise/installs/android-sdk/20.0",
+        "ANDROID_USER_HOME": "/root/.android",
+        "REACT_NATIVE_PACKAGER_HOSTNAME": "localhost",
+        "GRADLE_USER_HOME": "/workspace/.gradle",
+        "MISE_CACHE_DIR": "/root/.cache/mise",
+        "MISE_DATA_DIR": "/root/.local/share/mise",
+        "MISE_STATE_DIR": "/root/.local/state/mise",
+        "MISE_TRUSTED_CONFIG_PATHS": "/workspace",
+        "NODE_EXTRA_CA_CERTS": "/workspace/secrets/certs/ca.crt",
+        "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+        "PIP_NO_CACHE_DIR": "1",
+        "PIP_REQUIRE_VIRTUALENV": "true"
+    },
+    "remoteEnv": {
+        "PATH": "${containerEnv:PATH}:/root/.local/share/mise/shims:${containerEnv:ANDROID_HOME}/cmdline-tools/20.0/bin:${containerEnv:ANDROID_HOME}/platform-tools"
+    },
+    "portsAttributes": {
+        "8081": {
+            "label": "Metro Bundler",
+            "visibility": "public"
+        },
+        "19006": {
+            "label": "Expo Web",
+            "visibility": "public"
+        }
+    },
+    "runArgs": [
+        "--name=expo",
+        "--tmpfs=/tmp:rw,exec,nosuid,nodev,mode=1777",
+        "--userns=keep-id",
+        "--add-host=host.docker.internal:host-gateway"
+    ],
+    "initializeCommand": [
+        "bash",
+        "-lc",
+        "mkdir -p \"${localWorkspaceFolder}/.cache\" \"${localWorkspaceFolder}/.gradle\" \"${localWorkspaceFolder}/app/node_modules\" && if command -v xattr >/dev/null 2>&1; then xattr -dr user.containers.override_stat \"${localWorkspaceFolder}\" 2>/dev/null || true; fi"
+    ],
+    "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "biomejs.biome",
+                "expo.vscode-expo-tools",
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ],
+            "settings": {
+                "npm.packageManager": "bun",
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash",
+                        "args": ["-l"]
+                    }
+                }
+            }
+        }
+    },
+    "workspaceFolder": "/workspace",
+    "mounts": [
+        {
+            "source": "${localWorkspaceFolder}",
+            "target": "/workspace",
+            "type": "bind"
+        },
+        {
+            "source": "${localWorkspaceFolderBasename}-node_modules",
+            "target": "/workspace/app/node_modules",
+            "type": "volume"
+        },
+        {
+            "source": "${localWorkspaceFolderBasename}-mise-data",
+            "target": "/root/.local/share/mise",
+            "type": "volume"
+        },
+        {
+            "source": "${localWorkspaceFolderBasename}-mise-cache",
+            "target": "/root/.cache/mise",
+            "type": "volume"
+        },
+        {
+            "source": "${localWorkspaceFolderBasename}-mise-state",
+            "target": "/root/.local/state/mise",
+            "type": "volume"
+        },
+        {
+            "source": "${localWorkspaceFolderBasename}-gradle-cache",
+            "target": "/workspace/.gradle",
+            "type": "volume"
+        },
+        {
+            "source": "${localWorkspaceFolderBasename}-workspace-cache",
+            "target": "/workspace/.cache",
+            "type": "volume"
+        }
+    ],
+    "remoteUser": "root",
+    "updateRemoteUserUID": false
 }

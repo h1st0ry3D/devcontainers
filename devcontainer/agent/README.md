@@ -1,6 +1,6 @@
 # Agent Dev Container
 
-Dev container with Homebrew, opencode (AI agent), pi (AI agent), and dotfiles from hstorz/dotfiles.
+Dev container with Homebrew, opencode (AI agent), pi (AI agent), and dotfiles from h1st0ry3D/dotfiles.
 
 ## How It Works
 

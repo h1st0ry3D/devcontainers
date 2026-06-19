@@ -10,7 +10,7 @@ USER vscode
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 
-RUN curl -fsSL https://raw.githubusercontent.com/hstorz/dotfiles/main/Brewfile -o /tmp/Brewfile \
+RUN curl -fsSL https://raw.githubusercontent.com/h1st0ry3D/dotfiles/main/Brewfile -o /tmp/Brewfile \
     && brew bundle --file=/tmp/Brewfile \
     && rm /tmp/Brewfile
 
